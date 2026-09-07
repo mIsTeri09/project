@@ -32,5 +32,5 @@ router.post('/verify', (req, res) => {
         res.status(401).json({ valid: false });
     }
 });
-
+console.log('✅ Auth routes loaded');
 module.exports = router;

@@ -26,6 +26,7 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
 // Routes
 app.use('/api/auth', authRoutes);
+console.log('✅ Auth middleware registered');
 app.use('/api/targets', targetsRoutes);
 app.use('/api/commands', commandsRoutes);
 app.use('/api/logs', logsRoutes);
