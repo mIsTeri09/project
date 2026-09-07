@@ -1,7 +1,4 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "cd panel-backend && npm install"
-startCommand = "cd panel-backend && npm start"
-
-[deploy]
-rootDirectory = "panel-backend"
+buildCommand = "npm run install"
+startCommand = "npm run start"

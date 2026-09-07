@@ -1,0 +1,7 @@
+{
+  "name": "rat-ecosystem",
+  "scripts": {
+    "install": "cd panel-backend && npm install",
+    "start": "cd panel-backend && npm start"
+  }
+}
