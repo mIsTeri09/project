@@ -10,7 +10,7 @@ export const WS_URL = API_BASE.replace('https', 'wss') + '/socket.io/update';
 
 // Konfigurasi tambahan (opsional)
 export const CONFIG = {
-    heartbeatInterval: 15000, // refresh target setiap 15 detik
+    heartbeatInterval: 15000,
     maxRetries: 3,
     timeout: 10000
 };

@@ -25,19 +25,28 @@
         <div id="errorMsg" class="text-danger mt-2"></div>
     </div>
     <script>
+        // 🔥 GANTI DENGAN URL RAILWAY-MU
         const API_BASE = 'https://project-production-82c9.up.railway.app';
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            e.preventDefault(); // Mencegah submit default
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!username || !password) {
+                document.getElementById('errorMsg').innerText = 'Username dan password wajib diisi';
+                return;
+            }
+
             try {
                 const res = await fetch(API_BASE + '/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
+
                 const data = await res.json();
-                if (data.token) {
+                if (res.ok && data.token) {
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('api_base', API_BASE);
                     window.location.href = 'dashboard.html';
@@ -45,6 +54,7 @@
                     document.getElementById('errorMsg').innerText = data.error || 'Login failed';
                 }
             } catch (err) {
+                console.error('Fetch error:', err);
                 document.getElementById('errorMsg').innerText = 'Network error: ' + err.message;
             }
         });

@@ -7,15 +7,22 @@ const crypto = require('crypto');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
+// 🔥 ROUTE GET untuk debug (agar tidak 404 jika ada GET)
+router.get('/login', (req, res) => {
+    console.log('⚠️ GET /login called (should be POST)');
+    res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
+});
+
 router.post('/login', async (req, res) => {
-    console.log('🔹 Login route hit'); // <-- LOG PERTAMA
+    console.log('🔹 Login route hit');
+    console.log('📦 Body received:', req.body);
     try {
         const { username, password } = req.body;
-        console.log('📩 Received:', { username, password }); // <-- LOG BODY
 
+        // Validasi input
         if (!username || !password) {
-            console.log('❌ Missing credentials');
-            return res.status(400).json({ error: 'Missing credentials' });
+            console.log('❌ Missing username or password');
+            return res.status(400).json({ error: 'Missing username or password' });
         }
 
         const db = getDb();
@@ -55,11 +62,6 @@ router.post('/verify', (req, res) => {
     } catch (e) {
         res.status(401).json({ valid: false });
     }
-});
-
-router.get('/login', (req, res) => {
-    console.log('⚠️ GET /login called (should be POST)');
-    res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
 });
 
 console.log('✅ Auth routes loaded');
