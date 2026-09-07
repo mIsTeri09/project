@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BREAD C2 - Dashboard</title>
+    <title>BREAD C2 - Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,7 +15,7 @@
             <div class="col-md-2 sidebar">
                 <h4 class="text-glow"><i class="bi bi-cpu"></i> BREAD C2</h4>
                 <nav class="nav flex-column">
-                    <a class="nav-link active" href="dashboard.html"><i class="bi bi-grid"></i> Dashboard</a>
+                    <a class="nav-link active" href="panel.html"><i class="bi bi-grid"></i> Dashboard</a>
                     <a class="nav-link" href="target.html"><i class="bi bi-phone"></i> Targets</a>
                     <a class="nav-link" href="#"><i class="bi bi-terminal"></i> Commands</a>
                     <a class="nav-link" href="#"><i class="bi bi-file-earmark-text"></i> Logs</a>
@@ -57,25 +57,19 @@
     </div>
     <script type="module">
         // ================================================================
-        // 🔥 DASHBOARD UTAMA — DENGAN TOKEN CHECK
+        // PANEL UTAMA — DENGAN TOKEN CHECK
         // ================================================================
         import { API_BASE } from './js/config.js';
 
-        console.log('🔹 Dashboard loaded');
-        console.log('🔹 API_BASE:', API_BASE);
-
+        console.log('🔹 Panel loaded');
         const token = localStorage.getItem('token');
-        console.log('🔹 Token from localStorage:', token ? token.substring(0, 20) + '...' : 'null');
+        console.log('🔹 Token:', token ? token.substring(0,20) + '...' : 'null');
 
-        // 🔥 JIKA TOKEN TIDAK ADA, REDIRECT KE LOGIN
         if (!token) {
-            console.log('❌ No token found, redirecting to login');
+            console.log('❌ No token, redirect to login');
             window.location.replace('index.html');
-            // Hentikan eksekusi
             throw new Error('Redirect to login');
         }
-
-        console.log('✅ Token valid, loading dashboard...');
 
         // ================================================================
         // FUNGSI LOGOUT
@@ -96,14 +90,10 @@
                 const res = await fetch(API_BASE + '/api/targets', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                console.log('🔹 Targets response status:', res.status);
-                if (res.status === 401) {
-                    console.log('❌ Unauthorized, redirecting to login');
-                    logout();
-                    return;
-                }
+                console.log('🔹 Response status:', res.status);
+                if (res.status === 401) { logout(); return; }
                 const data = await res.json();
-                console.log('🔹 Targets data:', data);
+                console.log('🔹 Data:', data);
                 renderTargets(data);
                 updateStats(data);
                 updateChart(data);
@@ -235,7 +225,7 @@
         // ================================================================
         // START
         // ================================================================
-        console.log('🔹 Initializing dashboard...');
+        console.log('🔹 Initializing panel...');
         loadTargets();
         setInterval(loadTargets, 15000);
     </script>

@@ -5,6 +5,9 @@
     { "src": "js/*", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/$1" }
+    { "src": "/panel.html", "dest": "/panel.html" },
+    { "src": "/dashboard.html", "dest": "/panel.html" },
+    { "src": "/target.html", "dest": "/target.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

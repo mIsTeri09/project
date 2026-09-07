@@ -25,10 +25,18 @@
         <div id="errorMsg" class="text-danger mt-2"></div>
     </div>
     <script>
-        // 🔥 URL BACKEND RAILWAY
+        // 🔥 REDIRECT INSTAN KE PANEL JIKA TOKEN ADA
+        (function() {
+            const token = localStorage.getItem('token');
+            console.log('🔹 Index loaded, token:', token ? token.substring(0,20) + '...' : 'null');
+            if (token) {
+                console.log('🔹 Token found, redirecting to panel.html');
+                window.location.replace('panel.html');
+            }
+        })();
+
         const API_BASE = 'https://project-production-82c9.up.railway.app';
 
-        // 🔥 TIDAK ADA AUTO-REDIRECT DI SINI
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value.trim();
@@ -40,30 +48,26 @@
             }
 
             try {
-                console.log('🔹 Sending login request to:', API_BASE + '/api/auth/login');
+                console.log('🔹 Sending login request...');
                 const res = await fetch(API_BASE + '/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
 
-                console.log('🔹 Response status:', res.status);
                 const data = await res.json();
-                console.log('🔹 Response data:', data);
+                console.log('🔹 Response:', data);
 
                 if (res.ok && data.token) {
-                    console.log('✅ Login success, token:', data.token);
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('api_base', API_BASE);
-                    console.log('🔹 Token stored, redirecting with replace...');
-                    // 🔥 GUNAKAN replace() UNTUK MENGHINDARI HISTORY LOOP
-                    window.location.replace('dashboard.html');
+                    console.log('✅ Login success, redirecting to panel.html');
+                    window.location.replace('panel.html');
                 } else {
-                    console.log('❌ Login failed. res.ok:', res.ok, 'data.token:', data.token);
-                    document.getElementById('errorMsg').innerText = data.error || 'Login failed (check console)';
+                    document.getElementById('errorMsg').innerText = data.error || 'Login failed';
                 }
             } catch (err) {
-                console.error('🔥 Fetch error:', err);
+                console.error('🔥 Error:', err);
                 document.getElementById('errorMsg').innerText = 'Network error: ' + err.message;
             }
         });
