@@ -9,7 +9,7 @@ import java.security.SecureRandom;
 
 public class CryptoHelper {
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
-    private static final byte[] KEY = "10bfc4b9e966985e10688a6756b03c1a".getBytes(); // ganti dengan key dari server
+    private static final byte[] KEY = "9d6dbb97c457b9e99eca491da28977c8".getBytes(); // ganti dengan key dari server
 
     public JSONObject encrypt(JSONObject data) throws Exception {
         SecureRandom random = new SecureRandom();
