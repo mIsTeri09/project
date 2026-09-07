@@ -1,0 +1,144 @@
+/* ================================================================
+   BREAD C2 - DARK THEME (Bootstrap Override)
+   ================================================================ */
+body {
+    background: #0a0e17;
+    color: #c8d6e5;
+    font-family: 'Segoe UI', 'Roboto', monospace;
+}
+
+.navbar {
+    background: #0d1117;
+    border-bottom: 1px solid #1f2a3a;
+}
+
+.card {
+    background: #111927;
+    border: 1px solid #1f2a3a;
+    border-radius: 12px;
+}
+
+.card-header {
+    background: #0d1117;
+    border-bottom: 1px solid #1f2a3a;
+}
+
+.stat-card {
+    background: #111927;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #1f2a3a;
+    transition: all 0.2s ease;
+}
+.stat-card:hover {
+    border-color: #00d4ff;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.05);
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #00d4ff;
+}
+
+.badge-online {
+    background: #00d4ff;
+    color: #000;
+    font-weight: 600;
+}
+.badge-offline {
+    background: #4a5568;
+    color: #a0aec0;
+}
+
+.table-dark {
+    background: transparent;
+}
+.table-dark td,
+.table-dark th {
+    border-color: #1f2a3a;
+}
+
+.btn-primary {
+    background: #00d4ff;
+    border: none;
+    color: #000;
+}
+.btn-primary:hover {
+    background: #00b8d4;
+    color: #000;
+}
+
+.text-glow {
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.sidebar {
+    background: #0d1117;
+    border-right: 1px solid #1f2a3a;
+    min-height: 100vh;
+    padding: 20px;
+}
+.sidebar .nav-link {
+    color: #8a9bb5;
+    transition: 0.2s;
+}
+.sidebar .nav-link.active {
+    color: #00d4ff;
+    background: #1f2a3a;
+    border-radius: 8px;
+}
+.sidebar .nav-link:hover {
+    color: #c8d6e5;
+}
+
+.terminal {
+    background: #0a0e17;
+    color: #00ff41;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #1f2a3a;
+}
+
+.login-card {
+    background: #111927;
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid #1f2a3a;
+    width: 400px;
+    margin: 100px auto;
+}
+.login-card h3 {
+    color: #00d4ff;
+    text-align: center;
+}
+
+.form-control {
+    background: #0d1117;
+    border: 1px solid #1f2a3a;
+    color: #c8d6e5;
+}
+.form-control:focus {
+    background: #0d1117;
+    border-color: #00d4ff;
+    color: #c8d6e5;
+    box-shadow: none;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0d1117;
+}
+::-webkit-scrollbar-thumb {
+    background: #1f2a3a;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #2d3a4a;
+}

