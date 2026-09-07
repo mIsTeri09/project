@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Test</title>
+</head>
+<body>
+    <h1>Dashboard (Test)</h1>
+    <div id="info"></div>
+    <button onclick="logout()">Logout</button>
+    <script>
+        // 🔥 Cek token
+        const token = localStorage.getItem('token');
+        const apiBase = localStorage.getItem('api_base');
+        document.getElementById('info').innerHTML = `
+            <p>Token: ${token ? token.substring(0,20) + '...' : 'null'}</p>
+            <p>API Base: ${apiBase || 'null'}</p>
+        `;
+        console.log('Token:', token);
+        console.log('API Base:', apiBase);
+
+        // 🔥 Jika token ada, coba load targets
+        if (token) {
+            fetch(apiBase + '/api/targets', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('info').innerHTML += `<p>Targets: ${JSON.stringify(data)}</p>`;
+            })
+            .catch(err => {
+                document.getElementById('info').innerHTML += `<p style="color:red">Error: ${err.message}</p>`;
+            });
+        }
+
+        window.logout = function() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        };
+    </script>
+</body>
+</html>
