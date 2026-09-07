@@ -1,14 +1,10 @@
 {
   "builds": [
-    {
-      "src": "panel-frontend/**",
-      "use": "@vercel/static"
-    }
+    { "src": "panel-frontend/**", "use": "@vercel/static" }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/panel-frontend/index.html"
-    }
+    { "src": "/panel.html", "dest": "/panel-frontend/panel.html" },
+    { "src": "/index.html", "dest": "/panel-frontend/index.html" },
+    { "src": "/(.*)", "dest": "/panel-frontend/index.html" }
   ]
 }
