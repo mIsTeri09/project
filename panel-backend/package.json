@@ -1,7 +1,22 @@
 {
-  "name": "rat-ecosystem",
+  "name": "bread-rat-panel",
+  "version": "3.0.0",
+  "description": "BREAD RAT C2 Backend - Modular Structure",
+  "main": "server.js",
   "scripts": {
-    "install": "cd panel-backend && npm install",
-    "start": "cd panel-backend && npm start"
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.6",
+    "sqlite": "^5.1.1",
+    "crypto": "^1.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
