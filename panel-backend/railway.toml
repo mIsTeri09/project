@@ -1,4 +1,4 @@
 [build]
-builder = "NIXPACKS"
-buildCommand = "npm run install"
-startCommand = "npm run start"
+builder = "RAILPACK"
+buildCommand = "npm install"
+startCommand = "node server.js"
