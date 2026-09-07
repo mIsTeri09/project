@@ -1,0 +1,12 @@
+{
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "css/*", "use": "@vercel/static" },
+    { "src": "js/*", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/panel.html", "dest": "/panel.html" },
+    { "src": "/dashboard.html", "dest": "/panel.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
