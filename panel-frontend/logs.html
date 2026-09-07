@@ -52,7 +52,7 @@
 
         async function loadLogs() {
             try {
-                // Ambil semua log (belum ada endpoint global, ambil dari target pertama)
+                // Sementara kita ambil dari target pertama (belum ada endpoint /api/logs/all)
                 const res = await fetch(API_BASE + '/api/logs/all', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });

