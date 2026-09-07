@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "panel-frontend/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/panel-frontend/index.html"
+    }
+  ]
+}
