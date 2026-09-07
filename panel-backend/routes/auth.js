@@ -9,6 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('he
 
 router.post('/login', async (req, res) => {
     try {
+	console.log('🔹 Login route hit');
         const { username, password } = req.body;
         const db = getDb();
         const user = await db.get('SELECT * FROM users WHERE username = ?', [username]);
