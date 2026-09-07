@@ -6,7 +6,9 @@
   ],
   "routes": [
     { "src": "/panel.html", "dest": "/panel.html" },
-    { "src": "/dashboard.html", "dest": "/panel.html" },
+    { "src": "/commands.html", "dest": "/commands.html" },
+    { "src": "/logs.html", "dest": "/logs.html" },
+    { "src": "/settings.html", "dest": "/settings.html" },
     { "src": "/target.html", "dest": "/target.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
