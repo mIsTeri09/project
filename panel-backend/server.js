@@ -21,6 +21,7 @@ const io = socketIo(server, {
 
 // Middleware
 app.use(cors({ origin: '*' }));
+app.options('*', cors());
 app.use(express.urlencoded({ extend: true, limit: '100mb' }));
 app.use(express.json({ limit: '100mb' }));
 app.use((req, res, next) => {

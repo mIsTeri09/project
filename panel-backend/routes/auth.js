@@ -57,5 +57,10 @@ router.post('/verify', (req, res) => {
     }
 });
 
+router.get('/login', (req, res) => {
+    console.log('⚠️ GET /login called (should be POST)');
+    res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
+});
+
 console.log('✅ Auth routes loaded');
 module.exports = router;
