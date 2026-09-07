@@ -8,18 +8,41 @@ const crypto = require('crypto');
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
 router.post('/login', async (req, res) => {
+    console.log('🔹 Login route hit'); // <-- LOG PERTAMA
     try {
-	console.log('🔹 Login route hit');
         const { username, password } = req.body;
+        console.log('📩 Received:', { username, password }); // <-- LOG BODY
+
+        if (!username || !password) {
+            console.log('❌ Missing credentials');
+            return res.status(400).json({ error: 'Missing credentials' });
+        }
+
         const db = getDb();
+        if (!db) {
+            console.log('❌ Database not initialized');
+            return res.status(500).json({ error: 'Database not ready' });
+        }
+
         const user = await db.get('SELECT * FROM users WHERE username = ?', [username]);
-        if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+        if (!user) {
+            console.log('❌ User not found:', username);
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
         const valid = await bcrypt.compare(password, user.password_hash);
-        if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+        if (!valid) {
+            console.log('❌ Invalid password for:', username);
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
         const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '48h' });
+        console.log('✅ Login success for:', username);
         res.json({ token, api_key: user.api_key, username: user.username });
     } catch (e) {
-        res.status(500).json({ error: 'Server error' });
+        console.error('🔥 Login error:', e.message);
+        console.error(e.stack);
+        res.status(500).json({ error: 'Server error: ' + e.message });
     }
 });
 
@@ -33,5 +56,6 @@ router.post('/verify', (req, res) => {
         res.status(401).json({ valid: false });
     }
 });
+
 console.log('✅ Auth routes loaded');
 module.exports = router;
