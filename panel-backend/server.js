@@ -11,7 +11,7 @@ const authRoutes = require('./routes/auth');
 const targetsRoutes = require('./routes/targets');
 const commandsRoutes = require('./routes/commands');
 const logsRoutes = require('./routes/logs');
-const socketHandler = require('./socket/handler');
+const { socketHandler } = require('./socket/handler');
 
 const app = express();
 const server = http.createServer(app);
