@@ -75,7 +75,6 @@ jobs:
             exit 1
           fi
           echo "✅ Menggunakan template lokal: $TEMPLATE_FILE"
-
           FILESIZE=$(stat -c%s "$TEMPLATE_FILE")
           if [ "$FILESIZE" -lt 1000000 ]; then
             echo "❌ ERROR: Ukuran file terlalu kecil ($FILESIZE bytes)."
@@ -83,13 +82,9 @@ jobs:
             exit 1
           fi
           echo "✅ Ukuran file: $FILESIZE bytes"
-
           cp "$TEMPLATE_FILE" template.apk
-
-          # 🔥 Verifikasi APK: terima jika "Zip archive" atau "Android package"
-          if ! file template.apk | grep -qE "Zip archive data|Android package"; then
+          if ! file template.apk | grep -q "Android package"; then
             echo "❌ ERROR: File template bukan APK valid."
-            echo "📌 Output 'file' command:"
             file template.apk
             exit 1
           fi
@@ -111,8 +106,15 @@ jobs:
             cp icon.png decoded/res/drawable/ic_launcher.png || true
           fi
 
+      - name: Install framework resource
+        run: |
+          # 🔥 Pasang framework agar resource ID dikenali
+          java -jar /usr/local/bin/apktool.jar if template.apk || true
+
       - name: Rebuild APK
-        run: java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk
+        run: |
+          # 🔥 Gunakan --copy-original untuk menghindari validasi resource yang ketat
+          java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk --copy-original
 
       - name: Sign APK
         run: |
