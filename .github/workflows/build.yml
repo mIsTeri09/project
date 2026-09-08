@@ -35,15 +35,12 @@ jobs:
         with:
           lfs: true
 
-      - name: 🔥 Force install Git LFS and pull files
+      - name: Force install Git LFS and pull files
         run: |
-          # Install Git LFS jika belum ada
           sudo apt-get update
           sudo apt-get install -y git-lfs
           git lfs install
-          # Pull semua file LFS
           git lfs pull
-          # Tampilkan file-file LFS yang ada
           git lfs ls-files
 
       - name: Setup Java
@@ -68,7 +65,6 @@ jobs:
 
       - name: Prepare template APK (WAJIB LOKAL)
         run: |
-          # 🔥 WAJIB: File template HARUS ada di folder templates/
           TEMPLATE_FILE="templates/${{ inputs.bind_target }}.apk"
           if [ ! -f "$TEMPLATE_FILE" ]; then
             echo "❌ ERROR: File template tidak ditemukan: $TEMPLATE_FILE"
@@ -80,21 +76,19 @@ jobs:
           fi
           echo "✅ Menggunakan template lokal: $TEMPLATE_FILE"
 
-          # 🔥 VERIFIKASI UKURAN FILE (harus > 1 MB)
           FILESIZE=$(stat -c%s "$TEMPLATE_FILE")
           if [ "$FILESIZE" -lt 1000000 ]; then
             echo "❌ ERROR: Ukuran file terlalu kecil ($FILESIZE bytes)."
-            echo "📌 Kemungkinan file masih berupa pointer LFS (≈100 bytes)."
-            echo "📌 Pastikan Git LFS sudah diinstall dan file sudah di-pull."
-            echo "📌 Coba jalankan 'git lfs pull' secara manual di repo."
+            echo "📌 Kemungkinan file masih berupa pointer LFS."
             exit 1
           fi
           echo "✅ Ukuran file: $FILESIZE bytes"
 
           cp "$TEMPLATE_FILE" template.apk
-          # 🔥 VERIFIKASI APK VALID
-          if ! file template.apk | grep -q "Zip archive data"; then
-            echo "❌ ERROR: File template bukan APK valid (bukan zip archive)."
+
+          # 🔥 Verifikasi APK: terima jika "Zip archive" atau "Android package"
+          if ! file template.apk | grep -qE "Zip archive data|Android package"; then
+            echo "❌ ERROR: File template bukan APK valid."
             echo "📌 Output 'file' command:"
             file template.apk
             exit 1
