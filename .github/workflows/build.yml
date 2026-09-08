@@ -141,17 +141,23 @@ jobs:
           find decoded -name "public.xml" -delete 2>/dev/null || true
           echo "✅ DUMMYVAL berhasil dibersihkan"
 
-      - name: Remove problematic drawable files
+      - name: Remove all problematic drawable files
         run: |
+          # Hapus semua drawable yang bermasalah (AppCompat, Design, Material, dll.)
+          find decoded/res -name "abc_*" -delete 2>/dev/null || true
+          find decoded/res -name "design_*" -delete 2>/dev/null || true
+          find decoded/res -name "mtrl_*" -delete 2>/dev/null || true
+          find decoded/res -name "*\$*" -delete 2>/dev/null || true
+          # Hapus semua file yang mengandung kata 'vec_ic_glasses', 'avd_hide', 'avd_show'
           find decoded/res -name "*vec_ic_glasses*" -delete 2>/dev/null || true
           find decoded/res -name "*avd_hide_password*" -delete 2>/dev/null || true
           find decoded/res -name "*avd_show_password*" -delete 2>/dev/null || true
           find decoded/res -name "*mtrl_checkbox_button_checked_unchecked*" -delete 2>/dev/null || true
-          find decoded/res -name "*\$*" -delete 2>/dev/null || true
-          echo "✅ Drawable bermasalah dihapus"
+          echo "✅ Semua drawable bermasalah dihapus"
 
       - name: Rebuild APK with --copy-original
         run: |
+          # Gunakan --copy-original untuk menyalin resource asli tanpa kompilasi
           java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk --copy-original
 
       - name: Sign APK
