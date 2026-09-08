@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          lfs: true  # 🔥 KRUSIAL: agar file APK besar ter-download dengan benar
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -71,6 +73,7 @@ jobs:
           if ! file template.apk | grep -q "Zip archive data"; then
             echo "❌ ERROR: File template bukan APK valid (bukan zip archive)."
             echo "📌 Pastikan file yang diupload adalah APK yang benar."
+            echo "📌 Jika menggunakan Git LFS, pastikan checkout dengan lfs: true"
             exit 1
           fi
           echo "✅ Template APK valid."
