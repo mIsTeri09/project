@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.system.update.app-debug-28:/xml_accessibility_config.xml.flat",
+        "source": "com.system.update.app-main-30:/xml/accessibility_config.xml"
+    },
+    {
+        "merged": "com.system.update.app-debug-28:/xml_file_paths.xml.flat",
+        "source": "com.system.update.app-main-30:/xml/file_paths.xml"
+    }
+]
