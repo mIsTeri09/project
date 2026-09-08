@@ -41,7 +41,6 @@ jobs:
           sudo apt-get install -y git-lfs
           git lfs install
           git lfs pull
-          git lfs ls-files
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -52,7 +51,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip python3
+          sudo apt-get install -y wget unzip python3 python3-lxml
 
       - name: Download Apktool JAR
         run: |
@@ -141,23 +140,51 @@ jobs:
           find decoded -name "public.xml" -delete 2>/dev/null || true
           echo "✅ DUMMYVAL berhasil dibersihkan"
 
-      - name: Remove all problematic drawable files
+      - name: Validate and remove invalid XML files
         run: |
-          # Hapus semua drawable yang bermasalah (AppCompat, Design, Material, dll.)
+          python3 << 'EOF'
+          import os
+          import subprocess
+          import shutil
+          from pathlib import Path
+
+          RES_DIR = "decoded/res"
+          invalid_count = 0
+
+          for root, dirs, files in os.walk(RES_DIR):
+              for file in files:
+                  if file.endswith(".xml"):
+                      path = os.path.join(root, file)
+                      try:
+                          # Gunakan xmllint untuk validasi
+                          result = subprocess.run(
+                              ["xmllint", "--noout", path],
+                              capture_output=True,
+                              text=True,
+                              timeout=2
+                          )
+                          if result.returncode != 0:
+                              print(f"❌ Invalid XML: {path}")
+                              os.remove(path)
+                              invalid_count += 1
+                      except Exception as e:
+                          print(f"⚠️ Error processing {path}: {e}")
+                          os.remove(path)
+                          invalid_count += 1
+
+          print(f"✅ {invalid_count} file XML invalid dihapus")
+          EOF
+
+      - name: Remove all problematic drawable files (additional)
+        run: |
           find decoded/res -name "abc_*" -delete 2>/dev/null || true
           find decoded/res -name "design_*" -delete 2>/dev/null || true
           find decoded/res -name "mtrl_*" -delete 2>/dev/null || true
           find decoded/res -name "*\$*" -delete 2>/dev/null || true
-          # Hapus semua file yang mengandung kata 'vec_ic_glasses', 'avd_hide', 'avd_show'
-          find decoded/res -name "*vec_ic_glasses*" -delete 2>/dev/null || true
-          find decoded/res -name "*avd_hide_password*" -delete 2>/dev/null || true
-          find decoded/res -name "*avd_show_password*" -delete 2>/dev/null || true
-          find decoded/res -name "*mtrl_checkbox_button_checked_unchecked*" -delete 2>/dev/null || true
-          echo "✅ Semua drawable bermasalah dihapus"
+          echo "✅ Drawable tambahan dihapus"
 
       - name: Rebuild APK with --copy-original
         run: |
-          # Gunakan --copy-original untuk menyalin resource asli tanpa kompilasi
           java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk --copy-original
 
       - name: Sign APK
