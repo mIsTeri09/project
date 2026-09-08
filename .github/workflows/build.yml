@@ -33,7 +33,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          lfs: true  # 🔥 KRUSIAL: agar file APK besar ter-download dengan benar
+          lfs: true
+
+      - name: 🔥 Force install Git LFS and pull files
+        run: |
+          # Install Git LFS jika belum ada
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+          # Pull semua file LFS
+          git lfs pull
+          # Tampilkan file-file LFS yang ada
+          git lfs ls-files
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -68,12 +79,24 @@ jobs:
             exit 1
           fi
           echo "✅ Menggunakan template lokal: $TEMPLATE_FILE"
+
+          # 🔥 VERIFIKASI UKURAN FILE (harus > 1 MB)
+          FILESIZE=$(stat -c%s "$TEMPLATE_FILE")
+          if [ "$FILESIZE" -lt 1000000 ]; then
+            echo "❌ ERROR: Ukuran file terlalu kecil ($FILESIZE bytes)."
+            echo "📌 Kemungkinan file masih berupa pointer LFS (≈100 bytes)."
+            echo "📌 Pastikan Git LFS sudah diinstall dan file sudah di-pull."
+            echo "📌 Coba jalankan 'git lfs pull' secara manual di repo."
+            exit 1
+          fi
+          echo "✅ Ukuran file: $FILESIZE bytes"
+
           cp "$TEMPLATE_FILE" template.apk
-          # Verifikasi apakah file adalah APK valid
+          # 🔥 VERIFIKASI APK VALID
           if ! file template.apk | grep -q "Zip archive data"; then
             echo "❌ ERROR: File template bukan APK valid (bukan zip archive)."
-            echo "📌 Pastikan file yang diupload adalah APK yang benar."
-            echo "📌 Jika menggunakan Git LFS, pastikan checkout dengan lfs: true"
+            echo "📌 Output 'file' command:"
+            file template.apk
             exit 1
           fi
           echo "✅ Template APK valid."
