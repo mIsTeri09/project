@@ -110,11 +110,16 @@ jobs:
         run: |
           java -jar /usr/local/bin/apktool.jar if template.apk || true
 
-      - name: Remove dummy files and rebuild APK
+      - name: Remove dummy files and clean public.xml
         run: |
-          # 🔥 Hapus semua file dummy yang menyebabkan error validasi
+          # Hapus semua file dummy XML
           find decoded -name "APKTOOL_DUMMYVAL_*.xml" -delete
-          # 🔥 Build dengan --no-build-resources (-b) untuk skip kompilasi resource
+          # Hapus semua referensi dummy di public.xml
+          sed -i '/APKTOOL_DUMMYVAL/d' decoded/res/values/public.xml || true
+
+      - name: Rebuild APK
+        run: |
+          # Build dengan skip resource compilation
           java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk -b
 
       - name: Sign APK
