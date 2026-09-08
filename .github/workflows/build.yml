@@ -108,13 +108,14 @@ jobs:
 
       - name: Install framework resource
         run: |
-          # 🔥 Pasang framework agar resource ID dikenali
           java -jar /usr/local/bin/apktool.jar if template.apk || true
 
-      - name: Rebuild APK
+      - name: Remove dummy files and rebuild APK
         run: |
-          # 🔥 Gunakan --copy-original untuk menghindari validasi resource yang ketat
-          java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk --copy-original
+          # 🔥 Hapus semua file dummy yang menyebabkan error validasi
+          find decoded -name "APKTOOL_DUMMYVAL_*.xml" -delete
+          # 🔥 Build dengan --no-build-resources (-b) untuk skip kompilasi resource
+          java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk -b
 
       - name: Sign APK
         run: |
