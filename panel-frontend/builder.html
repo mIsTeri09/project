@@ -110,6 +110,13 @@
         import { API_BASE } from './js/config.js';
         const token = localStorage.getItem('token');
         if (!token) window.location.replace('index.html');
+	console.log('🔹 Builder loaded, token:', token);
+	if (!token) {
+	    console.log('❌ No token, redirect to login');
+	    window.location.replace('index.html');
+	} else {
+	    console.log('✅ Token found, builder ready');
+	}
 
         window.logout = function() {
             localStorage.removeItem('token');

@@ -10,6 +10,7 @@
     { "src": "/logs.html", "dest": "/logs.html" },
     { "src": "/settings.html", "dest": "/settings.html" },
     { "src": "/target.html", "dest": "/target.html" },
+    { "src": "/builder.html", "dest": "/builder.html" },
     { "src": "/", "dest": "/index.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
